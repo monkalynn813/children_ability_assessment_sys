@@ -30,8 +30,15 @@
 - Voltage data with 0 weight at notch was applied again after applied 75 lbs to check if the force sensor was able to recover function in a short time.
 - The range of 0 to 75 lbs was used in this process since human may most likely generate force in such range.
 - The none-zero voltage data with 0 weight applied at notch may not need a compensation in such formula since all measurement is relative to such baseline.
+- Sign of torque value refers to clockwise or counter-clockwise of the torque applied on sensor.
 
 ## Sample Calibration Data and Result
-
+- One can find this sample data at [sample_cali_data](https://github.com/monkalynn813/children_ability_assessment_sys/blob/master/calibration/sample_cali_data.csv).
+- The columns in csv data file have headers in following order: `weight(lbs)`, `torque(lb-in)`,`torque(N-m)`,`voltage(V)`.
+- A Matlab script [sensor_cali.m](https://github.com/monkalynn813/children_ability_assessment_sys/blob/master/calibration/sensor_cali.m) takes arguments `voltage` and `actual torque` as arrays. The linear regression coefficients, R-square value, and corresponding plot will be returned from this function.
+- With this set of calibration data, following result was returned:
+- ![sample_cali.jpg](https://github.com/monkalynn813/children_ability_assessment_sys/blob/master/calibration/img/sample_cali.jpg)
+- *Torque = -0.0191 x voltage - 0.1681*
+- *R square = 0.999*
 
   
