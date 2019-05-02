@@ -37,7 +37,7 @@
 - The columns in csv data file have headers in following order: `weight(lbs)`, `torque(lb-in)`,`torque(N-m)`,`voltage(V)`.
 - A Matlab script [sensor_cali.m](https://github.com/monkalynn813/children_ability_assessment_sys/blob/master/calibration/sensor_cali.m) takes arguments `voltage` and `actual torque` as arrays. The linear regression coefficients, R-square value, and corresponding plot will be returned from this function.
 - With this set of calibration data, following result was returned:
-- ![sample_cali.jpg](https://github.com/monkalynn813/children_ability_assessment_sys/blob/master/calibration/img/sample_cali.jpg)
+![sample_cali.jpg](https://github.com/monkalynn813/children_ability_assessment_sys/blob/master/calibration/img/sample_cali.jpg)
 - *Torque = -0.0191 x voltage - 0.1681*
 - *R square = 0.999*
 
