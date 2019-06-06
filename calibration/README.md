@@ -1,7 +1,7 @@
 # Force Sensor Calibration
 
 ## Description
-- The goal of the calibration on force sensor is to generate a formula that could convert the voltage signal coming from force sensor to actual torque applied on such sensor. Such relationship will be used whenever analyze on actual torque applied on sensor is required. The relationship is expected to be varied in minor ranges based on temperature, humidity and long time of constant usage of sensor. Such calibration is necessary to be re-proceed once environment of torque sensor is changed. This section reports one test trail of calibration process.
+- The goal of the calibration of force sensor is to generate a formula that could convert the voltage signal coming from the force sensor to actual torque applied on such sensor. Such relationship will be used whenever analyze on actual torque applied on sensor is required. The relationship may vary in minor ranges based on temperature, humidity and long time of constant usage of sensor. Such calibration is necessary to be re-proceed once environment of torque sensor is changed. This section reports one test trail of calibration process.
 
 
 ## Test Hardware 

@@ -1,0 +1,8 @@
+prefix=/home/jingyan/Documents/spring_proj/armproj_ws/devel
+
+Name: signal_recorder
+Description: Description of signal_recorder
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/jingyan/Documents/spring_proj/armproj_ws/devel/lib 
+Requires: 
