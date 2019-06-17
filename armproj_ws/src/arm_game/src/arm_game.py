@@ -9,8 +9,8 @@ path='/home/jingyan/Documents/spring_proj/armproj_ws/src/arm_game/src/img/'
 class gamer(object):
     def __init__(self):
         pygame.init()
-        self.screenwidth=1024
-        self.screenheight=576
+        self.screenwidth=1290
+        self.screenheight=768
         self.win=pygame.display.set_mode((self.screenwidth,self.screenheight))
         self.clock = pygame.time.Clock()
         pygame.display.set_caption("Arm Assessment Game")
@@ -21,13 +21,14 @@ class gamer(object):
         self.dirt_init()
         self.rainbow_init()
         self.house_init()
+        self.hint_init()
         ######################
         self.run =True
-        self.complete_flag=False
+        self.indi_mode_flag=False
         self.game_logic()
 ###ELEMENT INITILIZATION############
     def progressbar_init(self):
-        self.progress=progressbar_generator(self.screenwidth-40,self.screenheight,40,0,(0,0,225))
+        self.progress=progressbar_generator(self.screenwidth-40,self.screenheight,40,0,(65, 220, 244))
     def rain_init(self):
         self.rain=rain_drop_generator(0,0)
         self.rain_flag=False
@@ -40,6 +41,10 @@ class gamer(object):
         self.pic_amount=2
         self.picrot=0
         self.picscale=1
+    def hint_init(self):
+        self.hint_flag=False
+        font=pygame.font.SysFont("comicsansms",75)
+        self.hint=font.render("Chanllenge! Can You Copy Yourself ?", True, (43, 9, 183))
     def dirt_init(self):
         self.dirt=dirt_generator()
         self.clean_flag=False
@@ -51,7 +56,7 @@ class gamer(object):
         self.dirt_flag=True
         for i in range(self.dirt_amount):
             self.dirt_x.append(random.randint(10,self.bgpic.picw-self.dirt.width))
-            self.dirt_y.append(random.randint(40,self.bgpic.pich-self.dirt.height))
+            self.dirt_y.append(random.randint(70,self.bgpic.pich-self.dirt.height))
             i+=1
     def rainbow_init(self):
         self.rainbow=rainbow_generator()
@@ -59,7 +64,7 @@ class gamer(object):
         self.rainbow_vel=2
         self.text_flag=False
         font=pygame.font.SysFont("comicsansms",30)
-        self.text=font.render("You Earn The Picture!", True, (50,128,0))
+        self.text=font.render("You Earn The Picture!", True, (255, 250, 117))
     def house_init(self):
         self.house=house_generator()
         self.plus1_flag=False
@@ -78,32 +83,40 @@ class gamer(object):
             
             keys=pygame.key.get_pressed()
 
-
-            ####PROGRESS BAR
-            if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
-                self.progress.height-= self.progress.vel
-            else:
-                if self.progress.height<0:
-                    self.progress.height+=self.progress.vel*2
-            
-            ###RAIN DROP####
-            if self.progress.height<=(-self.screenheight+10):
-                self.rain_flag=True
-                self.rain_counter+=1
+            if not self.indi_mode_flag:
+                ####PROGRESS BAR
+                if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
+                    self.progress.height-= self.progress.vel
+                else:
+                    if self.progress.height<0:
+                        self.progress.height+=self.progress.vel*2
                 
-                if self.rain_counter>9:
-                    self.rain_counter=0
-                    self.fade_flag=True
+                ###RAIN DROP####
+                if self.progress.height<=(-self.screenheight+10):
+                    self.rain_flag=True
+                    self.rain_counter+=1
                     
+                    if self.rain_counter>9:
+                        self.rain_counter=0
+                        self.fade_flag=True
+                        
+                else:
+                    self.rain_flag=False
+                    self.rain_counter=0
+                    self.fade_flag=False
             else:
-                self.rain_flag=False
-                self.rain_counter=0
-                self.fade_flag=False
-
+                
+                if keys[pygame.K_RETURN]:
+                    self.hint_flag=False
+                if not self.hint_flag:
+                    if keys[pygame.K_SPACE]:
+                        self.fade_flag=True
+                    
             ###FADE DIRT#####
             if self.fade_flag and not self.clean_flag:
                 self.fade_counter+=5
                 if self.fade_counter>210:
+                    self.fade_flag=False
                     self.clean_flag=True
                     self.dirt_flag=False
                     self.fade_counter=0
@@ -134,9 +147,12 @@ class gamer(object):
                     self.dirt_init()
                     self.plus1_flag=False
                     rospy.sleep(1.0)
+                    self.indi_mode_flag= not self.indi_mode_flag
+                    if self.indi_mode_flag:
+                        self.hint_flag=True
                     if self.pic_counter>self.pic_amount-1:
                         self.pic_counter=0
-                        self.complete_flag=True
+                        
     
                 self.temp_picshow=pygame.transform.rotozoom(self.bgpic.showpic[self.pic_counter],self.picrot,self.picscale)
                 self.temp_frame=pygame.transform.rotozoom(self.bgpic.frame,self.picrot,self.picscale)
@@ -155,35 +171,39 @@ class gamer(object):
             showpic=self.bgpic.showpic[self.pic_counter]
             frame=self.bgpic.frame
         self.win.blit(self.bgpic.bg,(0,0))
-        self.win.blit(showpic,(20,50))
-        self.win.blit(frame,(0,40))
         
-        ##HOUSE
-        self.win.blit(self.house.house,(self.house.x,self.house.y))
-        if self.plus1_flag:
-            self.win.blit(self.house.plus1,(self.house.x+115,self.house.y))
-        ##DIRT
-        if self.dirt_flag:
-            for i in range(self.dirt_amount):
-                self.blit_alpha(self.dirt.dirt_img,(self.dirt_x[i],self.dirt_y[i]),225-self.fade_counter)
-        
-        ##PROGRESS
-        if not self.clean_flag:
-            pygame.draw.rect(self.win,self.progress.color, (self.progress.x,self.progress.y,self.progress.width,self.progress.height))
-        elif self.clean_flag:
-            pygame.draw.rect(self.win,self.progress.color, (self.progress.x,self.progress.y,self.progress.width,self.screenheight))
-
-        ##RAIN DROP
-        if self.rain_flag and not self.clean_flag:
-            self.win.blit(self.rain.rain_img[int(self.rain_counter//6)],(self.rain.x,self.rain.y))
-        
-        ##RAINBOW
-        if self.clean_flag:
-            self.win.blit(self.rainbow.rainbow,(self.rainbow.x+self.rainbow_movecount,self.rainbow.y))
-            self.win.blit(self.rainbow.rainbow,(self.rainbow.x-self.rainbow_movecount,self.rainbow.y))
-        if self.text_flag:
-            self.win.blit(self.text,(self.rainbow.x-15,self.rainbow.y+50))
+        if not self.hint_flag:
+            self.win.blit(showpic,(20,70))
+            self.win.blit(frame,(0,60))
             
+            ##HOUSE
+            self.win.blit(self.house.house,(self.house.x,self.house.y))
+            if self.plus1_flag:
+                self.win.blit(self.house.plus1,(self.house.x+115,self.house.y))
+            
+            ##DIRT
+            if self.dirt_flag:
+                for i in range(self.dirt_amount):
+                    self.blit_alpha(self.dirt.dirt_img,(self.dirt_x[i],self.dirt_y[i]),225-self.fade_counter)
+            
+            ##PROGRESS
+            if not self.clean_flag:
+                pygame.draw.rect(self.win,self.progress.color, (self.progress.x,self.progress.y,self.progress.width,self.progress.height))
+            elif self.clean_flag:
+                pygame.draw.rect(self.win,self.progress.color, (self.progress.x,self.progress.y,self.progress.width,self.screenheight))
+
+            ##RAIN DROP
+            if self.rain_flag and not self.clean_flag:
+                self.win.blit(self.rain.rain_img[int(self.rain_counter//6)],(self.rain.x,self.rain.y))
+            
+            ##RAINBOW
+            if self.clean_flag:
+                self.win.blit(self.rainbow.rainbow,(self.rainbow.x+self.rainbow_movecount,self.rainbow.y))
+                self.win.blit(self.rainbow.rainbow,(self.rainbow.x-self.rainbow_movecount,self.rainbow.y))
+            if self.text_flag:
+                self.win.blit(self.text,(self.rainbow.x-15,self.rainbow.y+50))
+        else:
+            self.win.blit(self.hint,(self.screenwidth//2-self.hint.get_width()//2,self.screenheight//2-self.hint.get_height()//2))
 
 
         pygame.display.update()
@@ -218,8 +238,8 @@ class showpic_generator(object):
     def __init__(self):
         
         global path
-        self.framew=980
-        self.frameh=496
+        self.framew=1050
+        self.frameh=600
         self.picw=self.framew-30
         self.pich=self.frameh-10
         self.showpic=[pygame.image.load(path+'bg_test.png'),pygame.image.load(path+'bg_test2.jpg')]
@@ -228,7 +248,7 @@ class showpic_generator(object):
         self.frame=pygame.image.load(path+'photo_frame.png')
         self.frame=pygame.transform.scale(self.frame,(self.framew,self.frameh))
         self.bg=pygame.image.load(path+'bg2.jpg')
-        self.bg=pygame.transform.scale(self.bg,(1024,576))
+        self.bg=pygame.transform.scale(self.bg,(1290,768))
         
 class dirt_generator(object):
     def __init__(self):
@@ -242,10 +262,10 @@ class dirt_generator(object):
 class rainbow_generator(object):
     def __init__(self):
         global path
-        self.width=160
-        self.height=80
-        self.x=430
-        self.y=460
+        self.width=180
+        self.height=90
+        self.x=480
+        self.y=550
         self.rainbow=pygame.image.load(path+'rainbow.png')
         self.rainbow=pygame.transform.scale(self.rainbow,(self.width,self.height))
 class house_generator(object):
