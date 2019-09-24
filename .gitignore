@@ -1,5 +1,5 @@
 #ignore devel and build directory
-devel/
-build/
+**/devel
+**/build
 #ignore CMakeList fild in src
 armproj_ws/src/CMakeLists.txt
