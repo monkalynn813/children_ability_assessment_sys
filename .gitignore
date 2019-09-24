@@ -2,4 +2,4 @@
 **/devel
 **/build
 #ignore CMakeList fild in src
-armproj_ws/src/CMakeLists.txt
+**/armproj_ws/src/CMakeLists.txt
