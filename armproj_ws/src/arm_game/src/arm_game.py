@@ -155,7 +155,7 @@ class gamer(object):
                         
     
                 self.temp_picshow=pygame.transform.rotozoom(self.bgpic.showpic[self.pic_counter],self.picrot,self.picscale)
-                self.temp_frame=pygame.transform.rotozoom(self.bgpic.frame,self.picrot,self.picscale)
+                self.temp_frame=pygame.transform.rotozoom(self.bgpic.frame,self.picrot,self.picscale) 
 
             
             self.draw()  
