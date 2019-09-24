@@ -14,8 +14,12 @@
 - Shortcut has been tested and able to run `rosnode`
   - `publisher` works with a sample string
 - Potential Issues:
-  - Any `ros` command is slower than before, check if there will be a lag issue when do data streaming.
+  - Any `ros` command responses much slower than before, check if there will be a lag issue when do data streaming.
   - The directory has to be changed to the executable to run the node.
   
-  
-- Implement the NI-data acquisition card python API to a `rosnode`
+- Re-arrange github to update scripts from Linux and Windows 
+  - Keep the `build` and `devel` of `ROS` locally
+  - `git pull` to update scripts only
+
+- TODO
+  - Implement the NI-data acquisition card python API to a `rosnode`
