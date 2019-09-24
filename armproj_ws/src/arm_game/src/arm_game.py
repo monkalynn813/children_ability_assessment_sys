@@ -5,8 +5,8 @@ import numpy as np
 import random
 from std_msgs.msg import String
 
-# path='/home/jingyan/Documents/spring_proj/armproj_ws/src/arm_game/src/img/'
-path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\src\\arm_game\\src\img\\'
+path='/home/jingyan/Documents/spring_proj/armproj_ws/src/arm_game/src/img/'
+# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\src\\arm_game\\src\img\\'
 
 class gamer(object):
     def __init__(self):
