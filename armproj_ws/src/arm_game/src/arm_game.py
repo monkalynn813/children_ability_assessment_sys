@@ -3,9 +3,11 @@ import rospy
 import pygame
 import numpy as np
 import random
+from std_msgs.msg import String
 
 # path='/home/jingyan/Documents/spring_proj/armproj_ws/src/arm_game/src/img/'
 path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\src\\arm_game\\src\img\\'
+
 class gamer(object):
     def __init__(self):
         pygame.init()
@@ -23,9 +25,13 @@ class gamer(object):
         self.house_init()
         self.hint_init()
         ######################
-        self.run =True
+        self.test_publisher=rospy.Publisher('test_publish',String,queue_size=10)
+        
+        self.run =True #for while loop for gamer
         self.indi_mode_flag=False
         self.game_logic()
+
+        
 ###ELEMENT INITILIZATION############
     def progressbar_init(self):
         self.progress=progressbar_generator(self.screenwidth-40,self.screenheight,40,0,(65, 220, 244))
@@ -74,6 +80,7 @@ class gamer(object):
 
     def game_logic(self):
         while self.run and not rospy.is_shutdown() :
+            self.test_publisher.publish('0')
 
             self.clock.tick(27) ##60fps
             #events:
@@ -155,7 +162,7 @@ class gamer(object):
                         
     
                 self.temp_picshow=pygame.transform.rotozoom(self.bgpic.showpic[self.pic_counter],self.picrot,self.picscale)
-                self.temp_frame=pygame.transform.rotozoom(self.bgpic.frame,self.picrot,self.picscale) 
+                self.temp_frame=pygame.transform.rotozoom(self.bgpic.frame,self.picrot,self.picscale)
 
             
             self.draw()  
