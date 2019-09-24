@@ -1,2 +1,2 @@
-arm_game:data_stream:signal_recorder
--DCATKIN_DEVEL_PREFIX=/home/jingyan/Documents/spring_proj/armproj_ws/devel -DCMAKE_INSTALL_PREFIX=/home/jingyan/Documents/spring_proj/armproj_ws/install -G Unix Makefiles
+arm_game;data_stream;signal_recorder
+-DCMAKE_BUILD_TYPE=RelWithDebInfo -DCATKIN_DEVEL_PREFIX=C:\Users\pthms\Desktop\ling\children_ability_assessment_sys\armproj_ws\devel -DCMAKE_INSTALL_PREFIX=C:\Users\pthms\Desktop\ling\children_ability_assessment_sys\armproj_ws\install -G NMake Makefiles
