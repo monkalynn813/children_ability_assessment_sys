@@ -1,8 +1,0 @@
-prefix=/home/jingyan/Documents/spring_proj/armproj_ws/install
-
-Name: data_stream
-Description: Description of data_stream
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/jingyan/Documents/spring_proj/armproj_ws/install/lib 
-Requires: 

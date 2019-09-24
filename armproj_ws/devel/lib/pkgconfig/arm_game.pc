@@ -1,8 +1,0 @@
-prefix=/home/jingyan/Documents/spring_proj/armproj_ws/devel
-
-Name: arm_game
-Description: Description of arm_game
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/jingyan/Documents/spring_proj/armproj_ws/devel/lib 
-Requires: 
