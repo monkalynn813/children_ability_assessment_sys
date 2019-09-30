@@ -7,12 +7,14 @@
 - NI-data acquisition card with ROS
 - Add dependency: nidaqmx (python package)
 
+
 - Filtered data:
-  - INFO NEEDED: NI-DAQ card frequency
+  - INFO NEEDED: NI-DAQ card sample rate (fs)
   - determine moving window size
   - determine filtered data update frequency
   
 - TODO:
+  - Add ROS customize message type for multiple channel data
   - plot using RQT
 
 ## 09/24/2019
