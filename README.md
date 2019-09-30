@@ -2,15 +2,15 @@
 ## Engineering Journal
 #### Jingyan Ling
 
+## 09/25 - 09/30/2019
+
+- NI-data acquisition card with ROS
+
 ## 09/24/2019
 
 - ROS with Windows
   - Visual Studio 2019 version has been changed on the windows machine
   - The shortcut of `cmd` has been changed from `...\Community\...` to `...\Professional\...`
-  - Add the following target to the `ROS` shortcut
-  ~~~
-  &&C:\Users\pthms\Desktop\ling\force_ws\devel\setup.bat
-  ~~~
 - Shortcut has been tested and able to run `rosnode`
   - `publisher` works with a sample string
 - Potential Issues:
@@ -20,6 +20,10 @@
 - Re-arrange github to update scripts from Linux and Windows 
   - Keep the `build` and `devel` of `ROS` locally
   - `git pull` to update scripts only
+  - Check `gitignore` for detail
+- To run package from windows machine:
+  - Now shares the same repo as Linux version
+  - Need to source the `...\devel\setup.bat` every time
 
 - TODO
   - Implement the NI-data acquisition card python API to a `rosnode`
