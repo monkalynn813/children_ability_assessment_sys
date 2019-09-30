@@ -5,6 +5,15 @@
 ## 09/25 - 09/30/2019
 
 - NI-data acquisition card with ROS
+- Add dependency: nidaqmx (python package)
+
+- Filtered data:
+  - INFO NEEDED: NI-DAQ card frequency
+  - determine moving window size
+  - determine filtered data update frequency
+  
+- TODO:
+  - plot using RQT
 
 ## 09/24/2019
 
