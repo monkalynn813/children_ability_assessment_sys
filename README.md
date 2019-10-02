@@ -2,6 +2,25 @@
 ## Engineering Journal
 #### Jingyan Ling
 
+## 10/02/2019
+
+- Test `rostopic` publishing raw data from Ni-daq
+  - Maximum frequency can publish is around 47 Hz
+
+- Looking for ROS replacement for data communication
+  - Try `socket` for data networking 
+
+- Socket 
+  - UDP is able to send float array with `json`
+  - Specify frame rate of `talker` scripts
+    - `while loop` with specific frequency (?)
+    - Current issue: only one listener can receive data from one talker
+
+- Structure:
+  - one script that streams raw data in a loop with specified frequency and calls the callback function to do signal processing
+  - one script that **imports** the streamer and specify callback functions (raw, filtered, ...), **publishes** the data in the callback function to a port
+  - Interface scripts can listen to a port and proceed.
+  
 ## 09/25 - 09/30/2019
 
 - NI-data acquisition card with ROS
