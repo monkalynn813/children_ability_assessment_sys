@@ -27,13 +27,17 @@ class streamer(object):
 
         
     def read_daq(self):
+        rate=rospy.Rate(4000)
         for chn in self.channels:
-            self.daqtask.add_ai_voltage_chan(chn)
-        
-        raw_sig=self.daqtask.read()
-        self.raw_publisher.publish(raw_sig)
+            self.daqtask.ai_channels.add_ai_voltage_chan(chn)
+        while not rospy.is_shutdown():
+            raw_sig=self.daqtask.read()
+            # rospy.loginfo(raw_sig)
+            self.raw_publisher.publish(raw_sig)
+            # rate.sleep()
+            
 
-        self.filter_lp(raw_sig)
+        # self.filter_lp(raw_sig)
 
     def filter_lp(self,sample):
         if len(self.raw_sig_arr)>=self.window_size and len(self.raw_sig_arr) %1==0:
