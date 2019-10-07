@@ -2,6 +2,13 @@
 ## Engineering Journal
 #### Jingyan Ling
 
+## 10/07/2019
+
+- Convert the scripts to single thread and test if the computer has enough capability.
+- Use the script `ni_stream.py` for total control
+- Issue report:
+  - Inside the `game_logic` loop, how `pygame clock` runs 
+
 ## 10/02/2019
 
 - Test `rostopic` publishing raw data from Ni-daq
@@ -16,10 +23,15 @@
     - `while loop` with specific frequency (?)
     - Current issue: only one listener can receive data from one talker
 
+- multiple thread package for Python
+  python threading module / python multi-process
+  
 - Structure:
   - one script that streams raw data in a loop with specified frequency and calls the callback function to do signal processing
   - one script that **imports** the streamer and specify callback functions (raw, filtered, ...), **publishes** the data in the callback function to a port
   - Interface scripts can listen to a port and proceed.
+
+- When adding multiple channels to ni-daq task python API, module `read()` will return a list
   
 ## 09/25 - 09/30/2019
 
