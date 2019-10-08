@@ -2,6 +2,13 @@
 ## Engineering Journal
 #### Jingyan Ling
 
+
+## 10/08/2019
+
+- Put game in the single thread callback function get warning even with data acquisition frame rate at `100Hz`
+  
+- ![](journal_media/single_thread_fail.png)
+
 ## 10/07/2019
 
 - Convert the scripts to single thread and test if the computer has enough capability.
