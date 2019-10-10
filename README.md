@@ -3,11 +3,29 @@
 #### Jingyan Ling
 
 
+## 10/09/2019
+
+- Solving data networking with servers
+- Networking diagram
+- Issue Reported:
+  - When doing calibration, linear equation was made to convert raw voltage to torque. Is it accurate to use same equation for filtered voltage?
+- Networking using three ports:
+  - Raw port (from streamer to raw recorder)
+  - Filtered port (from streamer to game interface)
+  - Record flag port (from interface to raw recorder)
+- Raw port has been tested
+    - Issue reported:
+      - using `matplotlib` for real-time plotting is very slow
+      - Try some other tool, or use ROS RQT for plot only
+
 ## 10/08/2019
 
 - Put game in the single thread callback function get warning even with data acquisition frame rate at `100Hz`
-  
 - ![](journal_media/single_thread_fail.png)
+- Two options now:
+  - Multi-thread
+  - Server
+  
 
 ## 10/07/2019
 
