@@ -47,6 +47,8 @@ class signal_processor(object):
             
         elif len(self.raw_sig_arr)==0:
             print('Please wait for buffering...')
+        elif len(self.raw_sig_arr)==self.window_size-1:
+            print('Start streaming...')
 
         self.raw_sig_arr.append(sample) 
   
@@ -61,7 +63,7 @@ def lowpass(cutoff,data,fs,order=5):
 
 
 def main():
-        signal_processor(ni_fs=100)    
+    signal_processor(ni_fs=100)    
 
 if __name__ == '__main__':
 	main()

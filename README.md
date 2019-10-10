@@ -2,6 +2,17 @@
 ## Engineering Journal
 #### Jingyan Ling
 
+## 10/10/2019
+
+- Solving problems:
+  - 1. sending flag from interface to recorder (tested)
+  - 2. record only valuable raw torque to csv file (tested)
+  - 3. record tag to indicate current activity while writing into csv file (tested)
+
+- The logic of the gamer interface is called in `interface.py` in an infinity loop that takes `filtered signal` as an input
+- TODO:
+  - solve the issue that real-time data plotting with `matplotlib` for filter testing
+  - Test with actual NI data acquisition
 
 ## 10/09/2019
 
