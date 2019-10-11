@@ -9,17 +9,13 @@ import NIstreamer
 
 
 UDP_IP = "127.0.0.1" 
-FILTERED_PORT=5002
+FILTERED_PORT=5005
 RAW_PORT=5003
 BUFFER_SIZE=1024
 CALIBRATION=[1,0]   
 
 class signal_processor(object):
-    def __init__(self,channels=["Dev1/ai1"],ni_fs=1000):
-
-        savetag='raw_plot_test'
-        savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
-        self.savepath=savedir+savetag+'.csv'
+    def __init__(self,channels=["Dev1/ai0"],ni_fs=1000):
 
         self.channels=channels
         self.ni_fs=ni_fs
@@ -30,11 +26,10 @@ class signal_processor(object):
         #######data networking###
         self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
        
-        # NIstreamer.start_streaming(channels,callback,ni_fs)
-        NIstreamer.fake_streaming(channels,self.callback,ni_fs)
+        NIstreamer.start_streaming(channels,self.callback,ni_fs)
+        # NIstreamer.fake_streaming(channels,self.callback,ni_fs)
     
     def callback(self,sample):
-
         raw_torque=[]
         for chn_data in sample:
             raw_torque.append(CALIBRATION[0]*chn_data+CALIBRATION[1])

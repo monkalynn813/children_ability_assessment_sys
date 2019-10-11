@@ -26,7 +26,7 @@ def start_streaming(channels,callback,ni_fs=1000):
         now=time.time()
         
         raw_sig=daqtask.read()
-        callback(raw_sig)
+        callback([raw_sig])
 
         elapsed=time.time()-now
         try:
@@ -54,8 +54,4 @@ def fake_streaming(channels,callback,ni_fs=1000):
             warnings.warn('System cannot handle such high frame rate, lower the desired frequency or simplify your callback fucntion')
             continue
 
-
-savetag='raw_raw_plot_test'
-savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
-savepath=savedir+savetag+'.csv'
         

@@ -10,7 +10,7 @@ from  arm_game import gamer
 
 UDP_IP = "127.0.0.1" 
 FLAG_PORT=5004
-FILTERED_PORT=5002
+FILTERED_PORT=5005
 BUFFER_SIZE=1024
 CALIBRATION=[1,0]    
 
@@ -70,4 +70,4 @@ class user_interface(object):
 
 
 
-user_interface(mode='run')
+user_interface(mode='test')
