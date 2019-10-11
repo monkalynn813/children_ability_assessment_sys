@@ -36,15 +36,16 @@ def start_streaming(channels,callback,ni_fs=1000):
             continue
 
 def fake_streaming(channels,callback,ni_fs=1000):
-    import numpy as np
+    from math import sin
 
     period=1.0/ni_fs
     i=0
     while True:
         now=time.time()
-        raw_sig=np.sin(i)
+        raw_sig=sin(3*i)+sin(0.5*i)
         callback([raw_sig])
-        i+=1
+
+        i+=period
 
         elapsed=time.time()-now
         try:
@@ -54,5 +55,7 @@ def fake_streaming(channels,callback,ni_fs=1000):
             continue
 
 
-
+savetag='raw_raw_plot_test'
+savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
+savepath=savedir+savetag+'.csv'
         

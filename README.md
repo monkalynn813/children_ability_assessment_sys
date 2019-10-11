@@ -2,6 +2,13 @@
 ## Engineering Journal
 #### Jingyan Ling
 
+## 10/11/2019
+
+- For next week, solving problems:
+  - 1. Adding a function to auto calibrate for voltage offset
+  - 2. Real-time data plotting with Python
+  - 3. Filtered raw torque instead of raw voltage
+
 ## 10/10/2019
 
 - Solving problems:

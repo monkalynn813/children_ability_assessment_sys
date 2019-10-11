@@ -12,10 +12,15 @@ UDP_IP = "127.0.0.1"
 FILTERED_PORT=5002
 RAW_PORT=5003
 BUFFER_SIZE=1024
-
+CALIBRATION=[1,0]   
 
 class signal_processor(object):
     def __init__(self,channels=["Dev1/ai1"],ni_fs=1000):
+
+        savetag='raw_plot_test'
+        savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
+        self.savepath=savedir+savetag+'.csv'
+
         self.channels=channels
         self.ni_fs=ni_fs
         ######for filter#####
@@ -29,6 +34,10 @@ class signal_processor(object):
         NIstreamer.fake_streaming(channels,self.callback,ni_fs)
     
     def callback(self,sample):
+
+        raw_torque=[]
+        for chn_data in sample:
+            raw_torque.append(CALIBRATION[0]*chn_data+CALIBRATION[1])
         
         if len(self.raw_sig_arr)>=self.window_size and len(self.raw_sig_arr) %1==0:
             self.raw_sig_arr=self.raw_sig_arr[-self.window_size:]
@@ -40,7 +49,7 @@ class signal_processor(object):
                 channel_filtered=lowpass(self.cutoff_fq,channel_raw,self.ni_fs)
                 filtered_data_allchn.append(channel_filtered[-1])
             
-            msg=json.dumps(sample).encode() #ATTENTION: sample is one data point ahead of the filtered data
+            msg=json.dumps(raw_torque).encode() #ATTENTION: raw torque is one data point ahead of the filtered data
             self.sock.sendto(msg,(UDP_IP,RAW_PORT))
             msg=json.dumps(filtered_data_allchn).encode()
             self.sock.sendto(msg,(UDP_IP,FILTERED_PORT))
@@ -50,8 +59,8 @@ class signal_processor(object):
         elif len(self.raw_sig_arr)==self.window_size-1:
             print('Start streaming...')
 
-        self.raw_sig_arr.append(sample) 
-  
+        self.raw_sig_arr.append(raw_torque) 
+
 
 
 ######helper function###############

@@ -30,8 +30,6 @@ class raw_recorder(object):
         self.sock_flag.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
         self.sock_flag.bind((UDP_IP,FLAG_PORT))
 
-
-
         if mode=='test':
             self.plot_raw()
         if mode=='record':
@@ -93,4 +91,4 @@ class raw_recorder(object):
                 continue
 
                 
-raw_recorder(mode='record')
+raw_recorder(mode='test')
