@@ -88,7 +88,7 @@ class gamer(object):
         
 ########################################
 
-    def game_logic(self,signal=None):
+    def game_logic(self,signal=None,threshold=None):
 #in while loop (callback)
         # while True:
 
@@ -102,13 +102,15 @@ class gamer(object):
 
         if not self.indi_mode_flag:
             ####PROGRESS BAR
-            record_flag=[True,'active']
-            if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
+            record_flag=[True,'reference']
+            if signal[0]>threshold and self.progress.height>=-self.screenheight:
+            # if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
                 self.progress.height-= self.progress.vel
             else:
                 if self.progress.height<0:
                     self.progress.height+=self.progress.vel*2
             
+
             ###RAIN DROP####
             if self.progress.height<=(-self.screenheight+10):
                 self.rain_flag=True

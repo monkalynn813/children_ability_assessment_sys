@@ -39,35 +39,31 @@ class user_interface(object):
             data,addr=self.sock_filter.recvfrom(BUFFER_SIZE)
             data=json.loads(data)
             
-            filter_torque=[]
-            for chn_data in data:
-                filter_torque.append(CALIBRATION[0]*chn_data+CALIBRATION[1])
 
-            if i%10==0:
+            if i%1==0:
                 x.append(i)
-                y.append(filter_torque)
-                if len(y)>200:
-                    y=y[-200:]
-                    x=x[-200:]
+                y.append(data)
+                if len(y)>500:
+                    y=y[-500:]
+                    x=x[-500:]
                 
                 ax.plot(x,y,color='b')
                 fig.canvas.draw()
-                ax.set_xlim(left=max(0, i-100), right=i+100)
+                ax.set_xlim(left=max(0, i-600), right=i+600)
             i+=1
         plt.close()
 
     def interface(self):
         ui=gamer()
+        maxtorque=1
+        threshold=0.4*maxtorque
         while True:
             data,addr=self.sock_filter.recvfrom(BUFFER_SIZE)
             data=json.loads(data)
             
-            filter_torque=[]
-            for chn_data in data:
-                filter_torque.append(CALIBRATION[0]*chn_data+CALIBRATION[1])
 
-            ui.game_logic(filter_torque)
+            ui.game_logic(data,threshold)
 
 
 
-user_interface(mode='test')
+user_interface(mode='run')

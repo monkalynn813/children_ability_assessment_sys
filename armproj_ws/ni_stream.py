@@ -26,8 +26,8 @@ class signal_processor(object):
         #######data networking###
         self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
        
-        NIstreamer.start_streaming(channels,self.callback,ni_fs)
-        # NIstreamer.fake_streaming(channels,self.callback,ni_fs)
+        # NIstreamer.start_streaming(channels,self.callback,ni_fs)
+        NIstreamer.fake_streaming(channels,self.callback,ni_fs)
     
     def callback(self,sample):
         raw_torque=[]

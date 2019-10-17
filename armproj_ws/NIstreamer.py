@@ -37,12 +37,12 @@ def start_streaming(channels,callback,ni_fs=1000):
 
 def fake_streaming(channels,callback,ni_fs=1000):
     from math import sin
-
+    import numpy as np
     period=1.0/ni_fs
     i=0
     while True:
         now=time.time()
-        raw_sig=sin(3*i)+sin(0.5*i)
+        raw_sig=sin(2*np.pi*3*i)+sin(2*np.pi*0.5*i)
         callback([raw_sig])
 
         i+=period

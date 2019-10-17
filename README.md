@@ -2,10 +2,19 @@
 ## Engineering Journal
 #### Jingyan Ling
 
+## 10/14 ~ 10/17/2019
+
+- Solved issue:
+  - Real-time data plotting (raw and filtered data tested)
+  - Filtered torque 
+  - Interface takes signal with a threshold setting, progress bar moves with input respectively
+
+- TODO:
+  - Add zeroing and maximum torque test to the interface
 ## 10/11/2019
 
 - For next week, solving problems:
-  - 1. Adding a function to auto calibrate for voltage offset
+  - 1. Adding a function to auto calibrate for voltage offset (zeroing)
   - 2. Real-time data plotting with Python
   - 3. Filtered raw torque instead of raw voltage
 

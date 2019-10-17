@@ -47,20 +47,17 @@ class raw_recorder(object):
             data,addr=self.sock_raw.recvfrom(BUFFER_SIZE)
             data=json.loads(data)
             
-            raw_torque=[]
-            for chn_data in data:
-                raw_torque.append(CALIBRATION[0]*chn_data+CALIBRATION[1])
-
-            if i%10==0:
+            
+            if i%1==0:
                 x.append(i)
-                y.append(raw_torque)
-                if len(y)>200:
-                    y=y[-200:]
-                    x=x[-200:]
+                y.append(data)
+                if len(y)>500:
+                    y=y[-500:]
+                    x=x[-500:]
                 
                 ax.plot(x,y,color='b')
                 fig.canvas.draw()
-                ax.set_xlim(left=max(0, i-100), right=i+100)
+                ax.set_xlim(left=max(0, i-600), right=i+600)
             i+=1
         plt.close()
 
@@ -68,9 +65,7 @@ class raw_recorder(object):
         while True:
             data,addr=self.sock_raw.recvfrom(BUFFER_SIZE)
             data=json.loads(data)
-            raw_torque=[]
-            for chn_data in data:
-                raw_torque.append(CALIBRATION[0]*chn_data+CALIBRATION[1])
+
 
             flag,addr_=self.sock_flag.recvfrom(BUFFER_SIZE)
             flag=json.loads(flag)
@@ -81,7 +76,7 @@ class raw_recorder(object):
                     row=''
                     row+=str(tag)
                     row+=self.delim
-                    for t in raw_torque:
+                    for t in data:
                         row+=str(t)
                         row+=self.delim
                     row+='\n'
