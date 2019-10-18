@@ -23,7 +23,7 @@ class signal_processor(object):
         ######for filter#####
         self.raw_sig_arr=[]
         self.window_size=250
-        self.cutoff_fq=2 #Hz
+        self.cutoff_fq=40 #Hz
         #######data networking###
         self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         self.game=gamer()
@@ -49,7 +49,7 @@ class signal_processor(object):
             # self.sock.sendto(msg,(UDP_IP,RAW_PORT))
             # msg=json.dumps(filtered_data_allchn).encode()
             # self.sock.sendto(msg,(UDP_IP,FILTERED_PORT))
-            self.game.game_logic(sample,2.0)
+            self.game.game_logic(filtered_data_allchn,2.0)
         elif len(self.raw_sig_arr)==0:
             print('Please wait for buffering...')
         elif len(self.raw_sig_arr)==self.window_size-1:
@@ -69,7 +69,7 @@ def lowpass(cutoff,data,fs,order=5):
 
 
 def main():
-    signal_processor(ni_fs=100)    
+    signal_processor(ni_fs=1000)    
 
 if __name__ == '__main__':
 	main()
