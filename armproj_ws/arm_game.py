@@ -35,8 +35,8 @@ class gamer(object):
         ######################
 
         self.indi_mode_flag=False
-        while True:
-            self.game_logic()
+        # while True:
+        #     self.game_logic()
 
     def send_flag(self,flag): #Flag=boolean
         msg=json.dumps(flag).encode()
