@@ -7,6 +7,13 @@
 - Issue reported:
   - There is a large lag for data networking when putting the game in the loop
 
+- Have tested single thread, with raw data instead of filtered data. The response was quick enough
+  
+- Potential solutions:
+  - Single thread
+  - Simplify game rendering 
+  - Play around with the filter
+  
 ## 10/14 ~ 10/17/2019
 
 - Solved issue:
