@@ -6,6 +6,7 @@ import socket
 import json
 import time
 import NIstreamer
+from arm_game import gamer
 
 
 UDP_IP = "127.0.0.1" 
@@ -25,9 +26,9 @@ class signal_processor(object):
         self.cutoff_fq=2 #Hz
         #######data networking###
         self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-       
-        # NIstreamer.start_streaming(channels,self.callback,ni_fs)
-        NIstreamer.fake_streaming(channels,self.callback,ni_fs)
+        self.game=gamer()
+        NIstreamer.start_streaming(channels,self.callback,ni_fs)
+        # NIstreamer.fake_streaming(channels,self.callback,ni_fs)
     
     def callback(self,sample):
         raw_torque=[]
@@ -44,16 +45,17 @@ class signal_processor(object):
                 channel_filtered=lowpass(self.cutoff_fq,channel_raw,self.ni_fs)
                 filtered_data_allchn.append(channel_filtered[-1])
             
-            msg=json.dumps(raw_torque).encode() #ATTENTION: raw torque is one data point ahead of the filtered data
-            self.sock.sendto(msg,(UDP_IP,RAW_PORT))
-            msg=json.dumps(filtered_data_allchn).encode()
-            self.sock.sendto(msg,(UDP_IP,FILTERED_PORT))
-            
+            # msg=json.dumps(raw_torque).encode() #ATTENTION: raw torque is one data point ahead of the filtered data
+            # self.sock.sendto(msg,(UDP_IP,RAW_PORT))
+            # msg=json.dumps(filtered_data_allchn).encode()
+            # self.sock.sendto(msg,(UDP_IP,FILTERED_PORT))
+            self.game.game_logic(filtered_data_allchn,2.0)
         elif len(self.raw_sig_arr)==0:
             print('Please wait for buffering...')
         elif len(self.raw_sig_arr)==self.window_size-1:
             print('Start streaming...')
 
+        
         self.raw_sig_arr.append(raw_torque) 
 
 

@@ -40,7 +40,7 @@ class user_interface(object):
             data=json.loads(data)
             
 
-            if i%1==0:
+            if i%10==0:
                 x.append(i)
                 y.append(data)
                 if len(y)>500:
@@ -55,12 +55,12 @@ class user_interface(object):
 
     def interface(self):
         ui=gamer()
-        maxtorque=1
-        threshold=0.4*maxtorque
+        # maxtorque=2.3
+        threshold=2
         while True:
             data,addr=self.sock_filter.recvfrom(BUFFER_SIZE)
             data=json.loads(data)
-            
+            print(data)
 
             ui.game_logic(data,threshold)
 
