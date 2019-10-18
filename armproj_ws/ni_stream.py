@@ -49,7 +49,7 @@ class signal_processor(object):
             # self.sock.sendto(msg,(UDP_IP,RAW_PORT))
             # msg=json.dumps(filtered_data_allchn).encode()
             # self.sock.sendto(msg,(UDP_IP,FILTERED_PORT))
-            self.game.game_logic(filtered_data_allchn,2.0)
+            self.game.game_logic(sample,2.0)
         elif len(self.raw_sig_arr)==0:
             print('Please wait for buffering...')
         elif len(self.raw_sig_arr)==self.window_size-1:
