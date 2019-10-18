@@ -11,6 +11,7 @@
 
 - TODO:
   - Add zeroing and maximum torque test to the interface
+  
 ## 10/11/2019
 
 - For next week, solving problems:

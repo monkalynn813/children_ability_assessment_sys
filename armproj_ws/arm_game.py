@@ -33,16 +33,17 @@ class gamer(object):
         self.house_init()
         self.hint_init()
         ######################
-        
-        self.run =True #for while loop for gamer
+
         self.indi_mode_flag=False
-        # self.game_logic()
+        while True:
+            self.game_logic()
 
     def send_flag(self,flag): #Flag=boolean
         msg=json.dumps(flag).encode()
         self.sock_flag.sendto(msg,(UDP_IP,FLAG_PORT))
         
 ###ELEMENT INITILIZATION############
+
     def progressbar_init(self):
         self.progress=progressbar_generator(self.screenwidth-40,self.screenheight,40,0,(65, 220, 244))
     def rain_init(self):
@@ -100,89 +101,93 @@ class gamer(object):
         
         keys=pygame.key.get_pressed()
 
-        if not self.indi_mode_flag:
-            ####PROGRESS BAR
-            record_flag=[True,'reference']
-            if signal[0]>threshold and self.progress.height>=-self.screenheight:
-            # if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
-                self.progress.height-= self.progress.vel
-            else:
-                if self.progress.height<0:
-                    self.progress.height+=self.progress.vel*2
+        if keys[pygame.K_SPACE]:
             
 
-            ###RAIN DROP####
-            if self.progress.height<=(-self.screenheight+10):
-                self.rain_flag=True
-                self.rain_counter+=1
+
+            if not self.indi_mode_flag:
+                ####PROGRESS BAR
+                record_flag=[True,'reference']
+                if signal[0]>threshold and self.progress.height>=-self.screenheight:
+                # if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
+                    self.progress.height-= self.progress.vel
+                else:
+                    if self.progress.height<0:
+                        self.progress.height+=self.progress.vel*2
                 
-                if self.rain_counter>9:
+
+                ###RAIN DROP####
+                if self.progress.height<=(-self.screenheight+10):
+                    self.rain_flag=True
+                    self.rain_counter+=1
+                    
+                    if self.rain_counter>9:
+                        self.rain_counter=0
+                        self.fade_flag=True
+                        
+                else:
+                    self.rain_flag=False
                     self.rain_counter=0
-                    self.fade_flag=True
-                    
+                    self.fade_flag=False
             else:
-                self.rain_flag=False
-                self.rain_counter=0
-                self.fade_flag=False
-        else:
-            record_flag=False
-            if keys[pygame.K_RETURN]:
-                self.hint_flag=False
-            if not self.hint_flag:
-                if not self.fade_flag:
-                    record_flag=[True,'indicative']
-                if keys[pygame.K_SPACE]:
-                    record_flag=False
-                    self.fade_flag=True
-                
-        ###FADE DIRT#####
-        if self.fade_flag and not self.clean_flag:
-            self.fade_counter+=5
-            if self.fade_counter>210:
-                self.fade_flag=False
-                self.clean_flag=True
-                self.dirt_flag=False
-                self.fade_counter=0
-
-        ###RAINBOW###       
-        if self.clean_flag:
-            record_flag=False
-            self.rainbow_movecount+=self.rainbow_vel
-            if self.rainbow_movecount>80:
-                self.text_flag=True
-            if self.rainbow_movecount >=150:
-                self.rainbow_movecount=0
-                self.clean_flag=False
-                self.text_flag=False
-                self.picswitch_flag=True
-                time.sleep(1.0)
-
-        ##SWITCH PIC
-        if self.picswitch_flag:
-            record_flag=False
-            self.picrot-=1
-            self.picscale-=0.05
-            if self.picscale<=0.3:
-                self.plus1_flag=True
-            if self.picscale<=0:
-                self.picrot=0
-                self.picscale=1
-                self.pic_counter+=1
-                self.picswitch_flag=False
-                self.dirt_init()
-                self.plus1_flag=False
-                time.sleep(1.0)
-                self.indi_mode_flag= not self.indi_mode_flag
-                if self.indi_mode_flag:
-                    self.hint_flag=True
-                if self.pic_counter>self.pic_amount-1:
-                    self.pic_counter=0
+                record_flag=False
+                if keys[pygame.K_RETURN]:
+                    self.hint_flag=False
+                if not self.hint_flag:
+                    if not self.fade_flag:
+                        record_flag=[True,'indicative']
+                    if keys[pygame.K_SPACE]:
+                        record_flag=False
+                        self.fade_flag=True
                     
+            ###FADE DIRT#####
+            if self.fade_flag and not self.clean_flag:
+                self.fade_counter+=5
+                if self.fade_counter>210:
+                    self.fade_flag=False
+                    self.clean_flag=True
+                    self.dirt_flag=False
+                    self.fade_counter=0
 
-            self.temp_picshow=pygame.transform.rotozoom(self.bgpic.showpic[self.pic_counter],self.picrot,self.picscale)
-            self.temp_frame=pygame.transform.rotozoom(self.bgpic.frame,self.picrot,self.picscale)
+            ###RAINBOW###       
+            if self.clean_flag:
+                record_flag=False
+                self.rainbow_movecount+=self.rainbow_vel
+                if self.rainbow_movecount>80:
+                    self.text_flag=True
+                if self.rainbow_movecount >=150:
+                    self.rainbow_movecount=0
+                    self.clean_flag=False
+                    self.text_flag=False
+                    self.picswitch_flag=True
+                    time.sleep(1.0)
 
-        self.send_flag(record_flag)
+            ##SWITCH PIC
+            if self.picswitch_flag:
+                record_flag=False
+                self.picrot-=1
+                self.picscale-=0.05
+                if self.picscale<=0.3:
+                    self.plus1_flag=True
+                if self.picscale<=0:
+                    self.picrot=0
+                    self.picscale=1
+                    self.pic_counter+=1
+                    self.picswitch_flag=False
+                    self.dirt_init()
+                    self.plus1_flag=False
+                    time.sleep(1.0)
+                    self.indi_mode_flag= not self.indi_mode_flag
+                    if self.indi_mode_flag:
+                        self.hint_flag=True
+                    if self.pic_counter>self.pic_amount-1:
+                        self.pic_counter=0
+                        
+
+                self.temp_picshow=pygame.transform.rotozoom(self.bgpic.showpic[self.pic_counter],self.picrot,self.picscale)
+                self.temp_frame=pygame.transform.rotozoom(self.bgpic.frame,self.picrot,self.picscale)
+
+            self.send_flag(record_flag)
         self.draw()  
         
         # pygame.quit()
