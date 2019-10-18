@@ -2,6 +2,11 @@
 ## Engineering Journal
 #### Jingyan Ling
 
+## 10/18/2019
+
+- Issue reported:
+  - There is a large lag for data networking when putting the game in the loop
+
 ## 10/14 ~ 10/17/2019
 
 - Solved issue:
