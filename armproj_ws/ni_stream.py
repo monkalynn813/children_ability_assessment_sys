@@ -30,7 +30,7 @@ class signal_processor(object):
         ######for filter#####
         self.raw_sig_arr=[]
         self.window_size=250
-        self.cutoff_fq=2 #Hz
+        self.cutoff_fq=40 #Hz
         #######data networking###
         # self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         self.game=gamer(self.savepath)
@@ -64,6 +64,7 @@ class signal_processor(object):
         # elif len(self.raw_sig_arr)==self.window_size-1:
         #     print('Start streaming...')
 
+
         
         self.raw_sig_arr.append(raw_torque) 
 
@@ -78,7 +79,7 @@ def lowpass(cutoff,data,fs,order=5):
 
 
 def main():
-    signal_processor(ni_fs=100)    
+    signal_processor(ni_fs=1000)    
 
 if __name__ == '__main__':
 	main()
