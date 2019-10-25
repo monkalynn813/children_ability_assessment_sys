@@ -2,10 +2,18 @@
 ## Engineering Journal
 #### Jingyan Ling
 
+## 10/21 - 10/25/2019
+
+- Is the filter necessary
+- Test two torque sensors and feedback interface
+- Test zeroing function
+
 ## 10/18/2019
 
 - Issue reported:
   - There is a large lag for data networking when putting the game in the loop
+    - Based on observation and trials:
+      - Total lag = lag from filter + lag from data networking
 
 - Have tested single thread, with raw data instead of filtered data. The response was quick enough
   

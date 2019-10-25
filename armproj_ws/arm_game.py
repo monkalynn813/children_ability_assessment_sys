@@ -7,17 +7,17 @@ import time
 import socket
 import json
 
-# path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
-path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
+# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
 
 UDP_IP = "127.0.0.1" 
 FLAG_PORT=5004
 
 
 class gamer(object):
-    def __init__(self):
-        self.sock_flag = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-        
+    def __init__(self,savepath):
+        # self.sock_flag = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+        self.savepath=savepath
         pygame.init()
         self.screenwidth=1290
         self.screenheight=768
@@ -37,10 +37,23 @@ class gamer(object):
         self.indi_mode_flag=False
         # while True:
         #     self.game_logic()
-
-    def send_flag(self,flag): #Flag=boolean
-        msg=json.dumps(flag).encode()
-        self.sock_flag.sendto(msg,(UDP_IP,FLAG_PORT))
+    def record_to_file(self,data,tag):
+        """
+        type(data)==list
+        [sensor_data,sensor_data,...]
+        tag=str i.e 'reference'
+        """
+        row=''
+        for d in data:
+            row+=str(d)
+            row+=','
+        row+=str(tag)
+        row+='\n'
+        with open(self.savepath,'a') as f:
+            f.write(row)
+    # def send_flag(self,flag): #Flag=boolean
+    #     msg=json.dumps(flag).encode()
+    #     self.sock_flag.sendto(msg,(UDP_IP,FLAG_PORT))
         
 ###ELEMENT INITILIZATION############
 
@@ -89,7 +102,7 @@ class gamer(object):
         
 ########################################
 
-    def game_logic(self,signal=None,threshold=None):
+    def game_logic(self,signal,threshold,ref_inx):
 #in while loop (callback)
         # while True:
 
@@ -104,10 +117,10 @@ class gamer(object):
 
         if not self.indi_mode_flag:
             ####PROGRESS BAR
-            record_flag=[True,'reference']
-            if signal[0]>threshold and self.progress.height>=-self.screenheight:
+            self.record_to_file(signal,'reference')
+            if signal[ref_inx]>threshold and self.progress.height>=-self.screenheight:
             # if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
-                self.progress.height-= self.progress.vel
+                self.progress.height-= self.progress.vel*2
             else:
                 if self.progress.height<0:
                     self.progress.height+=self.progress.vel*2
@@ -127,14 +140,12 @@ class gamer(object):
                 self.rain_counter=0
                 self.fade_flag=False
         else:
-            record_flag=False
             if keys[pygame.K_RETURN]:
                 self.hint_flag=False
             if not self.hint_flag:
                 if not self.fade_flag:
-                    record_flag=[True,'indicative']
+                    self.record_to_file(signal,'indicative')
                 if keys[pygame.K_SPACE]:
-                    record_flag=False
                     self.fade_flag=True
                 
         ###FADE DIRT#####
@@ -148,7 +159,6 @@ class gamer(object):
 
         ###RAINBOW###       
         if self.clean_flag:
-            record_flag=False
             self.rainbow_movecount+=self.rainbow_vel
             if self.rainbow_movecount>80:
                 self.text_flag=True
@@ -161,7 +171,6 @@ class gamer(object):
 
         ##SWITCH PIC
         if self.picswitch_flag:
-            record_flag=False
             self.picrot-=1
             self.picscale-=0.05
             if self.picscale<=0.3:
@@ -306,8 +315,8 @@ class house_generator(object):
         self.plus1=pygame.transform.scale(self.plus1,(75,75))
 
 
-def main():
-    gamer()    
+# def main():
+#     gamer()    
             
-if __name__ == '__main__':
-	main()
+# if __name__ == '__main__':
+# 	main()

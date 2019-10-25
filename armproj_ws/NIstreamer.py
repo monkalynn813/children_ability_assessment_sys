@@ -26,7 +26,7 @@ def start_streaming(channels,callback,ni_fs=1000):
         now=time.time()
         
         raw_sig=daqtask.read()
-        callback([raw_sig])
+        callback(raw_sig)
 
         elapsed=time.time()-now
         try:
