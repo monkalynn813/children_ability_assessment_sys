@@ -7,7 +7,7 @@ import json
 import time
 import NIstreamer
 from arm_game import gamer
-
+from max_test import calibrator
 
 UDP_IP = "127.0.0.1" 
 FILTERED_PORT=5005
@@ -20,8 +20,8 @@ RIGHT_SENSOR="Dev1/ai0"
 
 class signal_processor(object):
     def __init__(self,channels=[RIGHT_SENSOR,LEFT_SENSOR],ni_fs=1000,ref_inx=0):
-        savetag='test_record001'
-        savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
+        savetag='test_record1025_3'
+        savedir='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\data\\'
         self.savepath=savedir+savetag+'.csv'
         
         self.channels=channels
@@ -33,40 +33,41 @@ class signal_processor(object):
         self.cutoff_fq=40 #Hz
         #######data networking###
         # self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-        self.game=gamer(self.savepath)
-        NIstreamer.start_streaming(channels,self.callback,ni_fs)
+
+        self.calibrate=calibrator()
+        NIstreamer.start_streaming(channels,self.callback_cali,ni_fs)
+        # self.game=gamer(self.savepath)
+        # NIstreamer.start_streaming(channels,self.callback_game,ni_fs)
         # NIstreamer.fake_streaming(channels,self.callback,ni_fs)
     
-    def callback(self,sample):
+    def callback_cali(self,sample):
+        if type(sample)!=list:
+            sample=[sample]
+
+        if len(self.raw_sig_arr)>=self.window_size:
+            self.calibrate.logic(sample)
+        else:
+            if len(self.raw_sig_arr)==0:
+                print('Please wait for buffering...')
+            self.raw_sig_arr.append(sample)
+
+    def callback_game(self,sample):
+
         if type(sample)!=list:
             sample=[sample]
         raw_torque=[]
         for chn_data in sample:
             raw_torque.append(CALIBRATION[0]*chn_data+CALIBRATION[1])
         
-        # if len(self.raw_sig_arr)>=self.window_size and len(self.raw_sig_arr) %1==0:
-        #     self.raw_sig_arr=self.raw_sig_arr[-self.window_size:]
 
-        #     raw_sig_matrix=np.array(self.raw_sig_arr)
-        #     filtered_data_allchn=[]
-        #     for k in range(len(self.channels)):
-        #         channel_raw=raw_sig_matrix[:,k]
-        #         channel_filtered=lowpass(self.cutoff_fq,channel_raw,self.ni_fs)
-        #         filtered_data_allchn.append(channel_filtered[-1])
-            
-            # msg=json.dumps(raw_torque).encode() #ATTENTION: raw torque is one data point ahead of the filtered data
-            # self.sock.sendto(msg,(UDP_IP,RAW_PORT))
-            # msg=json.dumps(filtered_data_allchn).encode()
-            # self.sock.sendto(msg,(UDP_IP,FILTERED_PORT))
-        self.game.game_logic(raw_torque,2.0,self.ref_inx)
-        # elif len(self.raw_sig_arr)==0:
-        #     print('Please wait for buffering...')
-        # elif len(self.raw_sig_arr)==self.window_size-1:
-        #     print('Start streaming...')
+        if len(self.raw_sig_arr)>=self.window_size:
+            print(raw_torque)
+            # self.game.game_logic(raw_torque,1.2,self.ref_inx)
+        else:
+            if len(self.raw_sig_arr)==0:
+                print('Please wait for buffering...')
+            self.raw_sig_arr.append(raw_torque)
 
-
-        
-        self.raw_sig_arr.append(raw_torque) 
 
 
 
