@@ -21,7 +21,8 @@ RIGHT_SENSOR="Dev1/ai0"
 class signal_processor(object):
     def __init__(self,channels=[RIGHT_SENSOR,LEFT_SENSOR],ni_fs=1000,ref_inx=0):
         savetag='test_record1025_3'
-        savedir='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\data\\'
+        savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
+        # savedir='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\data\\'
         self.savepath=savedir+savetag+'.csv'
         
         self.channels=channels
@@ -30,14 +31,14 @@ class signal_processor(object):
         ######for filter#####
         self.raw_sig_arr=[]
         self.window_size=250
-        self.cutoff_fq=40 #Hz
+        # self.cutoff_fq=40 #Hz
         #######data networking###
         # self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 
-        self.calibrate=calibrator()
+        self.calibrate=calibrator(self.savepath)
         NIstreamer.start_streaming(channels,self.callback_cali,ni_fs)
-        # self.game=gamer(self.savepath)
-        # NIstreamer.start_streaming(channels,self.callback_game,ni_fs)
+        self.game=gamer(self.savepath)
+        NIstreamer.start_streaming(channels,self.callback_game,ni_fs)
         # NIstreamer.fake_streaming(channels,self.callback,ni_fs)
     
     def callback_cali(self,sample):

@@ -121,9 +121,8 @@ class gamer(object):
             if signal[ref_inx]>threshold and self.progress.height>=-self.screenheight:
             # if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
                 self.progress.height-= self.progress.vel*2
-            else:
-                if self.progress.height<0:
-                    self.progress.height+=self.progress.vel*2
+            elif self.progress.height<0:
+                self.progress.height+=self.progress.vel*2
             
 
             ###RAIN DROP####
@@ -159,6 +158,7 @@ class gamer(object):
 
         ###RAINBOW###       
         if self.clean_flag:
+            self.progress.height=0
             self.rainbow_movecount+=self.rainbow_vel
             if self.rainbow_movecount>80:
                 self.text_flag=True
