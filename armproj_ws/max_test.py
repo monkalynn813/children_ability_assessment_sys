@@ -7,8 +7,8 @@ import time
 import matplotlib.pyplot as plt
 
 
-path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
-# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+# path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
+path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
 
 
 class calibrator(object):
@@ -84,9 +84,10 @@ class calibrator(object):
         """return [push max, pull max]"""
         if len(self.maxpull_data)==0 or len(self.maxpush_data)==0:
             raise ValueError ('Please run the maximum torque test first')
-        window_size=250
+        window_size=25
         step_size=1
         c_pre=0
+        print(len(self.maxpull_data),len(self.maxpush_data))
         for i in range(len(self.maxpush_data)-window_size):
             c_win=self.maxpush_data[i:i+window_size]
             c_ma=np.average(c_win)
@@ -179,6 +180,7 @@ class calibrator(object):
                 self.push_test_done=False
                 self.max_push_hint=True
                 self.maxpush_data=[]
+                plt.clf()
             if keys[pygame.K_RETURN]:
                 self.max_pull_hint=True
                 self.show_pushplot=False
@@ -205,7 +207,7 @@ class calibrator(object):
             self.show_pullplot=True
             self.test_progress.width=0
             if self.make_pull_plot:
-                clf()
+                plt.clf()
                 plt.plot(self.maxpull_data)
                 plt.savefig(path+'max_pull.png')
                 self.make_pull_plot=False
@@ -216,6 +218,7 @@ class calibrator(object):
                 self.max_pull_hint=True
                 self.show_pullplot=False
                 self.make_pull_plot=True
+                plt.clf()
             if keys[pygame.K_RETURN]:
                 pygame.quit()
     
