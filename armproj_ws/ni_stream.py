@@ -36,9 +36,14 @@ class signal_processor(object):
         # self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 
         self.calibrate=calibrator(self.savepath)
-        NIstreamer.start_streaming(channels,self.callback_cali,ni_fs)
+        try:
+            NIstreamer.fake_streaming(channels,self.callback_cali,ni_fs)
+            
+        except: pass
+        self.offset=self.calibrate.get_offset()
+        self.max_torque=self.calibrate.get_maximum()
         self.game=gamer(self.savepath)
-        NIstreamer.start_streaming(channels,self.callback_game,ni_fs)
+        NIstreamer.fake_streaming(channels,self.callback_game,ni_fs)
         # NIstreamer.fake_streaming(channels,self.callback,ni_fs)
     
     def callback_cali(self,sample):
@@ -53,17 +58,19 @@ class signal_processor(object):
             self.raw_sig_arr.append(sample)
 
     def callback_game(self,sample):
+        
 
         if type(sample)!=list:
             sample=[sample]
         raw_torque=[]
-        for chn_data in sample:
-            raw_torque.append(CALIBRATION[0]*chn_data+CALIBRATION[1])
+        for i in range(len(sample)):
+            chn_data=sample[i]-self.offset[i]
+            raw_torque.append(CALIBRATION[0]*chn_data)
         
 
         if len(self.raw_sig_arr)>=self.window_size:
-            print(raw_torque)
-            # self.game.game_logic(raw_torque,1.2,self.ref_inx)
+        
+            self.game.game_logic(raw_torque,self.max_torque[0]*0.4,self.ref_inx)
         else:
             if len(self.raw_sig_arr)==0:
                 print('Please wait for buffering...')

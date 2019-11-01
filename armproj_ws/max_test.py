@@ -4,6 +4,7 @@ import pygame
 import numpy as np
 import random
 import time
+import matplotlib.pyplot as plt
 
 
 path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
@@ -26,12 +27,13 @@ class calibrator(object):
         self.zero_init()
         self.test_hint_init()
         self.progressbar_init()
-
+        self.clouds_init()
+        self.plot_init()
         
 
         self.run=True
-        while self.run:
-            self.logic([1,4])
+        # while self.run:
+        #     self.logic([1,4])
     def record_to_file(self,data,tag):
         """
         type(data)==list
@@ -46,6 +48,15 @@ class calibrator(object):
         row+='\n'
         with open(self.savepath,'a') as f:
             f.write(row)
+    def plot_init(self):
+        self.show_pushplot=False
+        self.show_pullplot=False
+        self.make_push_plot=True
+        self.make_pull_plot=True
+
+    def clouds_init(self):
+        self.cloud=img_generator(180,90,90,self.screenheight//2,'cloud.png')
+        
     def showpic_init(self):
         self.bgpic=showpic_generator()
     def zero_init(self):
@@ -61,12 +72,41 @@ class calibrator(object):
         self.do_pull_test=False
         self.push_test_done=False
         self.pull_test_done=False
+        self.maxpull_data=[]
+        self.maxpush_data=[]
     def progressbar_init(self):
         self.cali_progress=progressbar_generator(self.screenwidth//2-100,self.screenheight//2 +50,0,40,(65, 220, 244))  
         self.test_progress=progressbar_generator(self.screenwidth//2,self.screenheight//2,0,40,(65,220,244))
+    
+    def get_offset(self):
+        return self.offset
+    def get_maximum(self):
+        """return [push max, pull max]"""
+        if len(self.maxpull_data)==0 or len(self.maxpush_data)==0:
+            raise ValueError ('Please run the maximum torque test first')
+        window_size=250
+        step_size=1
+        c_pre=0
+        for i in range(len(self.maxpush_data)-window_size):
+            c_win=self.maxpush_data[i:i+window_size]
+            c_ma=np.average(c_win)
+            
+            if c_ma>=c_pre:
+                max_push=c_ma
+            c_pre=c_ma
+        
+        c_pre=0
+        for i in range(len(self.maxpull_data)-window_size):
+            c_win=self.maxpull_data[i:i+window_size]
+            c_ma=np.average(c_win)
+            if c_ma>=c_pre:
+                max_pull=c_ma
+            c_pre=c_ma
+        return [max_push,max_pull]
+
     def logic(self,signal):
         # while self.run:
-        self.clock.tick(27)
+        # self.clock.tick(27)
     
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -83,7 +123,7 @@ class calibrator(object):
         if self.zero_flag:
             self.data_4cali.append(signal)
             eclapsed= time.time()-self.now
-            self.cali_progress.width += 2
+            self.cali_progress.width += 0.5
             self.cali_percent=round(eclapsed / 3, 3) * 100
             if eclapsed>3.0:
                 self.zero_flag=False
@@ -114,24 +154,34 @@ class calibrator(object):
             self.now=time.time()
 
         if self.do_push_test:
-            
+            self.cloud.x=1100
             if keys[pygame.K_RIGHT]:
-                self.test_progress.width += 3
+                self.test_progress.width += 1
             elif self.test_progress.width>0: 
                 self.test_progress.width -= 6
+            self.maxpush_data.append(signal[0]-self.offset[0])
             eclapsed=time.time()-self.now
             self.time_left= int(5- eclapsed)
             if eclapsed > 5.0:
                 self.do_push_test=False
                 self.push_test_done=True
 
-        if self.push_test_done and not self.do_pull_test:
+        if self.push_test_done and not self.do_pull_test and not self.max_pull_hint and not self.pull_test_done:
+            self.show_pushplot=True
             self.test_progress.width=0
+            if self.make_push_plot:
+                plt.plot(self.maxpush_data)
+                plt.savefig(path+'max_push.png')
+                self.make_push_plot=False
             if keys[pygame.K_BACKSPACE]:
+                self.show_pushplot=False
+                self.make_push_plot=True
                 self.push_test_done=False
                 self.max_push_hint=True
+                self.maxpush_data=[]
             if keys[pygame.K_RETURN]:
                 self.max_pull_hint=True
+                self.show_pushplot=False
         
         if self.max_pull_hint and keys[pygame.K_SPACE]:
             self.max_pull_hint=False
@@ -139,10 +189,12 @@ class calibrator(object):
             self.now=time.time()
         
         if self.do_pull_test:
+            self.cloud.x=45
             if keys[pygame.K_LEFT]:
-                self.test_progress.width -= 3
+                self.test_progress.width -= 1
             elif self.test_progress.width <0: 
                 self.test_progress.width += 6
+            self.maxpull_data.append(signal[0]-self.offset[0])
             eclapsed=time.time()-self.now
             self.time_left= int(5- eclapsed)
             if eclapsed > 5.0:
@@ -150,16 +202,27 @@ class calibrator(object):
                 self.pull_test_done=True
         
         if self.pull_test_done:
+            self.show_pullplot=True
+            self.test_progress.width=0
+            if self.make_pull_plot:
+                clf()
+                plt.plot(self.maxpull_data)
+                plt.savefig(path+'max_pull.png')
+                self.make_pull_plot=False
             self.test_progress.width=0
             if keys[pygame.K_BACKSPACE]:
+                self.maxpull_data=[]
                 self.pull_test_done=False
                 self.max_pull_hint=True
+                self.show_pullplot=False
+                self.make_pull_plot=True
             if keys[pygame.K_RETURN]:
                 pygame.quit()
+    
+        try:
+            self.draw()
+        except: pass
 
-
-
-        self.draw()
 
     def draw(self):
         self.win.blit(self.bgpic.bg,(0,0))
@@ -183,14 +246,29 @@ class calibrator(object):
             self.hint=font.render("Pull the best you can for 5 sec", True, (43, 9, 183))
             self.win.blit(self.hint,(self.screenwidth//2-self.hint.get_width()//2,self.screenheight//2-self.hint.get_height()//2))
         if self.do_push_test or self.do_pull_test:
+            self.win.blit(self.cloud.img,(self.cloud.x,self.cloud.y))
             font=pygame.font.SysFont("comicsansms",90)
             self.hint=font.render(str(self.time_left), True, (43, 9, 183))
             self.win.blit(self.hint,(self.screenwidth//2-self.hint.get_width()//2,self.screenheight//2-2*self.hint.get_height()))
             pygame.draw.rect(self.win,self.test_progress.color, (self.test_progress.x,self.test_progress.y,self.test_progress.width,self.test_progress.height))
-        
-        
+        if self.show_pushplot:
+            self.push_plot=img_generator(1000,600,self.screenwidth//2-500,self.screenheight//2-300,'max_push.png')
+            self.win.blit(self.push_plot.img,(self.push_plot.x,self.push_plot.y))
+        if self.show_pullplot:
+            self.pull_plot=img_generator(1000,600,self.screenwidth//2-500,self.screenheight//2-300,'max_pull.png')
+            self.win.blit(self.pull_plot.img,(self.pull_plot.x,self.pull_plot.y))
         
         pygame.display.update()
+
+class img_generator(object):
+    def __init__(self,w,h,x,y,img_name):
+        global path
+        self.width=w
+        self.height=h
+        self.x=x
+        self.y=y
+        self.img=pygame.image.load(path+img_name)
+        self.img=pygame.transform.scale(self.img,(self.width,self.height))
 
 class progressbar_generator(object):
     def __init__(self,x,y,width,height,color):
@@ -208,8 +286,8 @@ class showpic_generator(object):
         self.bg=pygame.image.load(path+'bg2.jpg')
         self.bg=pygame.transform.scale(self.bg,(1290,768))
 
-def main():
-    calibrator()    
+# def main():
+#     calibrator()    
             
-if __name__ == '__main__':
-	main()
+# if __name__ == '__main__':
+# 	main()

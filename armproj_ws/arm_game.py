@@ -7,8 +7,8 @@ import time
 import socket
 import json
 
-# path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
-path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
+# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
 
 UDP_IP = "127.0.0.1" 
 FLAG_PORT=5004
@@ -106,7 +106,7 @@ class gamer(object):
 #in while loop (callback)
         # while True:
 
-        self.clock.tick(27) ##60fps
+        # self.clock.tick(27) ##60fps
         # events:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
