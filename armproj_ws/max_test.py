@@ -7,8 +7,8 @@ import time
 import matplotlib.pyplot as plt
 
 
-# path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
-path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
+# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
 
 
 class calibrator(object):
@@ -106,126 +106,135 @@ class calibrator(object):
         return [max_push,max_pull]
 
     def logic(self,signal):
-        # while self.run:
-        # self.clock.tick(27)
-    
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.run = False
+        if self.run:
+            # self.clock.tick(27)
+            self.record_flag=False
+            self.record_tag=None
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.run = False
 
-        keys=pygame.key.get_pressed()
+            keys=pygame.key.get_pressed()
 
-        #Do the zeroing
-        if not self.zero_done_flag and keys[pygame.K_RETURN]:
-            #get average in 3s and set as offset
-            self.zero_flag=True
-            self.now=time.time()
-        
-        if self.zero_flag:
-            self.data_4cali.append(signal)
-            eclapsed= time.time()-self.now
-            self.cali_progress.width += 0.5
-            self.cali_percent=round(eclapsed / 3, 3) * 100
-            if eclapsed>3.0:
-                self.zero_flag=False
-                data4cali=np.array(self.data_4cali)
-                for i in range(len(data4cali[0])):
-                    offset_=np.average(data4cali[:,i])
-                    self.offset.append(offset_)
-                self.zero_done_flag=True
-        
-        #Redo the zeroing
-        if self.zero_done_flag and not self.max_torque_test and keys[pygame.K_BACKSPACE]:
-            self.zero_done_flag=False
-            self.data_4cali=[]
-            self.offset=[]
-            self.zero_flag=True
-            self.cali_progress.width = 0
-            self.now=time.time()
-        
-        #Press Enter at offset screen to start maximum torque test
-        if self.zero_done_flag and not self.max_torque_test and keys[pygame.K_RETURN]:
-            self.max_torque_test=True
-            self.max_push_hint=True
+            #Do the zeroing
+            if not self.zero_done_flag and keys[pygame.K_RETURN]:
+                #get average in 3s and set as offset
+                self.zero_flag=True
+                self.now=time.time()
             
-        
-        if self.max_push_hint and keys[pygame.K_SPACE]:
-            self.max_push_hint=False
-            self.do_push_test=True #replace this for actual visual feedback later
-            self.now=time.time()
-
-        if self.do_push_test:
-            self.cloud.x=1100
-            if keys[pygame.K_RIGHT]:
-                self.test_progress.width += 1
-            elif self.test_progress.width>0: 
-                self.test_progress.width -= 6
-            self.maxpush_data.append(signal[0]-self.offset[0])
-            eclapsed=time.time()-self.now
-            self.time_left= int(5- eclapsed)
-            if eclapsed > 5.0:
-                self.do_push_test=False
-                self.push_test_done=True
-
-        if self.push_test_done and not self.do_pull_test and not self.max_pull_hint and not self.pull_test_done:
-            self.show_pushplot=True
-            self.test_progress.width=0
-            if self.make_push_plot:
-                plt.plot(self.maxpush_data)
-                plt.savefig(path+'max_push.png')
-                self.make_push_plot=False
-            if keys[pygame.K_BACKSPACE]:
-                self.show_pushplot=False
-                self.make_push_plot=True
-                self.push_test_done=False
+            if self.zero_flag:
+                self.data_4cali.append(signal)
+                eclapsed= time.time()-self.now
+                self.cali_progress.width += 0.5
+                self.cali_percent=round(eclapsed / 3, 3) * 100
+                if eclapsed>3.0:
+                    self.zero_flag=False
+                    data4cali=np.array(self.data_4cali)
+                    for i in range(len(data4cali[0])):
+                        offset_=np.average(data4cali[:,i])
+                        self.offset.append(offset_)
+                    self.zero_done_flag=True
+            
+            #Redo the zeroing
+            if self.zero_done_flag and not self.max_torque_test and keys[pygame.K_BACKSPACE]:
+                self.zero_done_flag=False
+                self.data_4cali=[]
+                self.offset=[]
+                self.zero_flag=True
+                self.cali_progress.width = 0
+                self.now=time.time()
+            
+            #Press Enter at offset screen to start maximum torque test
+            if self.zero_done_flag and not self.max_torque_test and keys[pygame.K_RETURN]:
+                self.max_torque_test=True
                 self.max_push_hint=True
-                self.maxpush_data=[]
-                plt.clf()
-            if keys[pygame.K_RETURN]:
-                self.max_pull_hint=True
-                self.show_pushplot=False
-        
-        if self.max_pull_hint and keys[pygame.K_SPACE]:
-            self.max_pull_hint=False
-            self.do_pull_test=True
-            self.now=time.time()
-        
-        if self.do_pull_test:
-            self.cloud.x=45
-            if keys[pygame.K_LEFT]:
-                self.test_progress.width -= 1
-            elif self.test_progress.width <0: 
-                self.test_progress.width += 6
-            self.maxpull_data.append(signal[0]-self.offset[0])
-            eclapsed=time.time()-self.now
-            self.time_left= int(5- eclapsed)
-            if eclapsed > 5.0:
-                self.do_pull_test=False
-                self.pull_test_done=True
-        
-        if self.pull_test_done:
-            self.show_pullplot=True
-            self.test_progress.width=0
-            if self.make_pull_plot:
-                plt.clf()
-                plt.plot(self.maxpull_data)
-                plt.savefig(path+'max_pull.png')
-                self.make_pull_plot=False
-            self.test_progress.width=0
-            if keys[pygame.K_BACKSPACE]:
-                self.maxpull_data=[]
-                self.pull_test_done=False
-                self.max_pull_hint=True
-                self.show_pullplot=False
-                self.make_pull_plot=True
-                plt.clf()
-            if keys[pygame.K_RETURN]:
-                pygame.quit()
-    
-        try:
-            self.draw()
-        except: pass
+                
+            
+            if self.max_push_hint and keys[pygame.K_SPACE]:
+                self.max_push_hint=False
+                self.do_push_test=True #replace this for actual visual feedback later
+                self.now=time.time()
 
+            if self.do_push_test:
+                self.record_flag=True
+                self.record_tag='max_push'
+                self.cloud.x=1100
+                if keys[pygame.K_RIGHT]:
+                    self.test_progress.width += 1
+                elif self.test_progress.width>0: 
+                    self.test_progress.width -= 6
+                self.maxpush_data.append(signal[0]-self.offset[0])
+                eclapsed=time.time()-self.now
+                self.time_left= int(5- eclapsed)
+                if eclapsed > 5.0:
+                    self.do_push_test=False
+                    self.push_test_done=True
+                    
+
+            if self.push_test_done and not self.do_pull_test and not self.max_pull_hint and not self.pull_test_done:
+                self.show_pushplot=True
+                self.test_progress.width=0
+                if self.make_push_plot:
+                    plt.plot(self.maxpush_data)
+                    plt.savefig(path+'max_push.png')
+                    self.make_push_plot=False
+                if keys[pygame.K_BACKSPACE]:
+                    self.show_pushplot=False
+                    self.make_push_plot=True
+                    self.push_test_done=False
+                    self.max_push_hint=True
+                    self.maxpush_data=[]
+                    plt.clf()
+                if keys[pygame.K_RETURN]:
+                    self.max_pull_hint=True
+                    self.show_pushplot=False
+            
+            if self.max_pull_hint and keys[pygame.K_SPACE]:
+                self.max_pull_hint=False
+                self.do_pull_test=True
+                self.now=time.time()
+            
+            if self.do_pull_test:
+                self.record_flag=True
+                self.record_tag='max_pull'
+                self.cloud.x=45
+                if keys[pygame.K_LEFT]:
+                    self.test_progress.width -= 1
+                elif self.test_progress.width <0: 
+                    self.test_progress.width += 6
+                self.maxpull_data.append(signal[0]-self.offset[0])
+                eclapsed=time.time()-self.now
+                self.time_left= int(5- eclapsed)
+                if eclapsed > 5.0:
+                    self.do_pull_test=False
+                    self.pull_test_done=True
+               
+            
+            if self.pull_test_done:
+                self.show_pullplot=True
+                self.test_progress.width=0
+                if self.make_pull_plot:
+                    plt.clf()
+                    plt.plot(self.maxpull_data)
+                    plt.savefig(path+'max_pull.png')
+                    self.make_pull_plot=False
+                self.test_progress.width=0
+                if keys[pygame.K_BACKSPACE]:
+                    self.maxpull_data=[]
+                    self.pull_test_done=False
+                    self.max_pull_hint=True
+                    self.show_pullplot=False
+                    self.make_pull_plot=True
+                    plt.clf()
+                if keys[pygame.K_RETURN]:
+                    pygame.quit()
+                    self.run=False
+        
+            try:
+                self.draw()
+            except: pass
+
+            return self.record_flag,self.record_tag
 
     def draw(self):
         self.win.blit(self.bgpic.bg,(0,0))

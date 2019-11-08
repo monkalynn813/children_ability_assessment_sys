@@ -3,7 +3,7 @@
 #### Jingyan Ling
 
 - game logic returns a flag to record data
-- 
+- pygame logic clock.tick sleeps the whole loop
 
 ## 10/21 - 10/25/2019
 
