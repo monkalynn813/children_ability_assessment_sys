@@ -2,6 +2,9 @@
 ## Engineering Journal
 #### Jingyan Ling
 
+- game logic returns a flag to record data
+- 
+
 ## 10/21 - 10/25/2019
 
 - Is the filter necessary
