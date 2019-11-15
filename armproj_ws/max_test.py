@@ -7,13 +7,14 @@ import time
 import matplotlib.pyplot as plt
 
 
-# path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
-path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
+# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
 
 
 class calibrator(object):
-    def __init__(self,savepath=None):
+    def __init__(self,ref_index,savepath=None):
         self.savepath=savepath
+        self.ref_index=ref_index
 
         pygame.init()
         self.screenwidth=1290
@@ -34,20 +35,7 @@ class calibrator(object):
         self.run=True
         # while self.run:
         #     self.logic([1,4])
-    def record_to_file(self,data,tag):
-        """
-        type(data)==list
-        [sensor_data,sensor_data,...]
-        tag=str i.e 'reference'
-        """
-        row=''
-        for d in data:
-            row+=str(d)
-            row+=','
-        row+=str(tag)
-        row+='\n'
-        with open(self.savepath,'a') as f:
-            f.write(row)
+
     def plot_init(self):
         self.show_pushplot=False
         self.show_pullplot=False
@@ -80,6 +68,7 @@ class calibrator(object):
     
     def get_offset(self):
         return self.offset
+    
     def get_maximum(self):
         """return [push max, pull max]"""
         if len(self.maxpull_data)==0 or len(self.maxpush_data)==0:
@@ -125,7 +114,7 @@ class calibrator(object):
             if self.zero_flag:
                 self.data_4cali.append(signal)
                 eclapsed= time.time()-self.now
-                self.cali_progress.width += 0.5
+                self.cali_progress.width += 3
                 self.cali_percent=round(eclapsed / 3, 3) * 100
                 if eclapsed>3.0:
                     self.zero_flag=False
@@ -159,11 +148,16 @@ class calibrator(object):
                 self.record_flag=True
                 self.record_tag='max_push'
                 self.cloud.x=1100
-                if keys[pygame.K_RIGHT]:
-                    self.test_progress.width += 1
+
+                ref_sample=signal[self.ref_index]-self.offset[self.ref_index]
+                if abs(ref_sample)>0.8:
+                # if keys[pygame.K_RIGHT]:
+                    self.test_progress.width += 2
                 elif self.test_progress.width>0: 
-                    self.test_progress.width -= 6
-                self.maxpush_data.append(signal[0]-self.offset[0])
+                    self.test_progress.width -= 2
+
+                self.maxpush_data.append(ref_sample)
+                
                 eclapsed=time.time()-self.now
                 self.time_left= int(5- eclapsed)
                 if eclapsed > 5.0:
@@ -175,6 +169,7 @@ class calibrator(object):
                 self.show_pushplot=True
                 self.test_progress.width=0
                 if self.make_push_plot:
+                    plt.clf()
                     plt.plot(self.maxpush_data)
                     plt.savefig(path+'max_push.png')
                     self.make_push_plot=False
@@ -184,7 +179,7 @@ class calibrator(object):
                     self.push_test_done=False
                     self.max_push_hint=True
                     self.maxpush_data=[]
-                    plt.clf()
+                    
                 if keys[pygame.K_RETURN]:
                     self.max_pull_hint=True
                     self.show_pushplot=False
@@ -198,11 +193,15 @@ class calibrator(object):
                 self.record_flag=True
                 self.record_tag='max_pull'
                 self.cloud.x=45
-                if keys[pygame.K_LEFT]:
-                    self.test_progress.width -= 1
+
+                ref_sample=signal[self.ref_index]-self.offset[self.ref_index]
+                if abs(ref_sample)>0.8:
+                # if keys[pygame.K_LEFT]:
+                    self.test_progress.width -= 2
                 elif self.test_progress.width <0: 
-                    self.test_progress.width += 6
-                self.maxpull_data.append(signal[0]-self.offset[0])
+                    self.test_progress.width += 2
+                
+                self.maxpull_data.append(ref_sample)
                 eclapsed=time.time()-self.now
                 self.time_left= int(5- eclapsed)
                 if eclapsed > 5.0:
@@ -225,7 +224,7 @@ class calibrator(object):
                     self.max_pull_hint=True
                     self.show_pullplot=False
                     self.make_pull_plot=True
-                    plt.clf()
+
                 if keys[pygame.K_RETURN]:
                     pygame.quit()
                     self.run=False
@@ -271,7 +270,20 @@ class calibrator(object):
             self.win.blit(self.pull_plot.img,(self.pull_plot.x,self.pull_plot.y))
         
         pygame.display.update()
-
+    def record_to_file(self,data,tag):
+        """
+        type(data)==list
+        [sensor_data,sensor_data,...]
+        tag=str i.e 'reference'
+        """
+        row=''
+        for d in data:
+            row+=str(d)
+            row+=','
+        row+=str(tag)
+        row+='\n'
+        with open(self.savepath,'a') as f:
+            f.write(row)
 class img_generator(object):
     def __init__(self,w,h,x,y,img_name):
         global path

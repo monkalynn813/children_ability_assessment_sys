@@ -13,7 +13,6 @@ def start_streaming(channels,callback,ni_fs=1000):
     callback: can take multiple callback functions as list
     ni_fs: sample rate
     """
-    period=1.0/ni_fs
 
     try:
         daqtask=daq.Task()
