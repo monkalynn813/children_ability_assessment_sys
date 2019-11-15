@@ -7,8 +7,8 @@ import time
 import matplotlib.pyplot as plt
 
 
-path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
-# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+# path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
+path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
 
 
 class calibrator(object):
@@ -69,31 +69,6 @@ class calibrator(object):
     def get_offset(self):
         return self.offset
     
-    def get_maximum(self):
-        """return [push max, pull max]"""
-        if len(self.maxpull_data)==0 or len(self.maxpush_data)==0:
-            raise ValueError ('Please run the maximum torque test first')
-        window_size=25
-        step_size=1
-        c_pre=0
-        print(len(self.maxpull_data),len(self.maxpush_data))
-        for i in range(len(self.maxpush_data)-window_size):
-            c_win=self.maxpush_data[i:i+window_size]
-            c_ma=np.average(c_win)
-            
-            if c_ma>=c_pre:
-                max_push=c_ma
-            c_pre=c_ma
-        
-        c_pre=0
-        for i in range(len(self.maxpull_data)-window_size):
-            c_win=self.maxpull_data[i:i+window_size]
-            c_ma=np.average(c_win)
-            if c_ma>=c_pre:
-                max_pull=c_ma
-            c_pre=c_ma
-        return [max_push,max_pull]
-
     def logic(self,signal):
         if self.run:
             # self.clock.tick(27)

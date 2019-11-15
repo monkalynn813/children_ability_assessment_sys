@@ -11,6 +11,7 @@
 
 - TODO:
   - Add button to the interface
+  - Check lag in pre-experiment interface when plotting
 
 ## 11/7/2019
 

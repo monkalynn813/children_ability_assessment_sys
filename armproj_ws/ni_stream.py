@@ -35,11 +35,11 @@ class signal_processor(object):
         self.to_record_arr=[]
         self.counter=0
         self.now=time.time()
-        try:
-            # NIstreamer.start_streaming(channels,self.callback_cali,ni_fs)
-            NIstreamer.fake_streaming(channels,self.callback_cali,ni_fs)
+        # try:
+        NIstreamer.start_streaming(channels,self.callback_cali,ni_fs)
+            # NIstreamer.fake_streaming(channels,self.callback_cali,ni_fs)
             
-        except: pass
+        # except: pass
 
        
         self.offset=self.pre_exp.get_offset()
@@ -64,6 +64,7 @@ class signal_processor(object):
                 pull_arr.append(sample)
 
         self.max_push,self.max_pull=get_maximum(push_arr,pull_arr)   
+        print(self.max_pull,self.max_push)
         self.record_to_file(self.to_record_arr)
         # self.max_torque=self.calibrate.get_maximum()
         # self.game=gamer(self.savepath)
@@ -78,7 +79,7 @@ class signal_processor(object):
             self.record_flag,self.tag=self.pre_exp.logic(sample)
 
         if self.record_flag:
-            timestamp=time.time-self.now
+            timestamp=time.time()-self.now
             self.to_record_arr.append([sample,self.tag,timestamp])
 
 
