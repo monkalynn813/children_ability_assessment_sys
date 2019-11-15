@@ -125,7 +125,7 @@ def lowpass(cutoff,data,fs,order=5):
 
 
 def main():
-    signal_processor(ni_fs=800)    
+    signal_processor(ni_fs=1000)    
 
 if __name__ == '__main__':
 	main()
