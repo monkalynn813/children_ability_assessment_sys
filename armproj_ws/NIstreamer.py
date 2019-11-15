@@ -21,19 +21,19 @@ def start_streaming(channels,callback,ni_fs=1000):
         raise ValueError('Unable to connect to DAQ device')     
     for chn in channels:
         daqtask.ai_channels.add_ai_voltage_chan(chn)
-    
+    daqtask.timing.samp_clk_rate=200
     while True:
-        now=time.time()
+        # now=time.time()
         
         raw_sig=daqtask.read()
         callback(raw_sig)
 
-        elapsed=time.time()-now
-        try:
-            time.sleep(period-elapsed)
-        except:
-            warnings.warn('System cannot handle such high frame rate, lower the desired frequency or simplify your callback fucntion')
-            continue
+        # elapsed=time.time()-now
+        # try:
+        #     time.sleep(period-elapsed)
+        # except:
+        #     warnings.warn('System cannot handle such high frame rate, lower the desired frequency or simplify your callback fucntion')
+        #     continue
 
 def fake_streaming(channels,callback,ni_fs=1000):
     from math import sin
