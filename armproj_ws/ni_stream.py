@@ -20,7 +20,7 @@ RIGHT_SENSOR="Dev1/ai0"
 
 class signal_processor(object):
     def __init__(self,channels=[RIGHT_SENSOR,LEFT_SENSOR],ni_fs=1000,ref_inx=0):
-        savetag='max_test418'
+        savetag='test_fs'
         # savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
         savedir='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\data\\'
         self.savepath=savedir+savetag+'.csv'
@@ -80,10 +80,18 @@ class signal_processor(object):
         #     self.record_flag,self.tag=self.calibrate.logic(sample)
 
         # if self.record_flag:
-        timestamp=time.time()-self.now
-        print(timestamp)
-        # self.to_record_arr.append([sample,'tag',timestamp])
-        # self.counter+=1
+        self.counter+=1
+        timestamp=time.time()
+        elapsed=timestamp-self.now
+        if elapsed>2.0:
+            fs=self.counter/2.0
+            print(fs)
+            self.counter=0
+            self.now=time.time()
+        
+          
+        self.to_record_arr.append([sample,'tag',timestamp])
+        
        
 
     def callback_game(self,sample):
@@ -117,7 +125,7 @@ def lowpass(cutoff,data,fs,order=5):
 
 
 def main():
-    signal_processor(ni_fs=1000)    
+    signal_processor(ni_fs=800)    
 
 if __name__ == '__main__':
 	main()

@@ -21,7 +21,7 @@ def start_streaming(channels,callback,ni_fs=1000):
         raise ValueError('Unable to connect to DAQ device')     
     for chn in channels:
         daqtask.ai_channels.add_ai_voltage_chan(chn)
-    daqtask.timing.samp_clk_rate=200
+    daqtask.timing.cfg_samp_clk_timing(ni_fs)
     while True:
         # now=time.time()
         
