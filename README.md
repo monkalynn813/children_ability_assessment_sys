@@ -2,6 +2,22 @@
 ## Engineering Journal
 #### Jingyan Ling
 
+
+## 11/15/2019
+
+- use calss `daqtask.timing.cfg_samp_clk_timing` controls the frame rate
+- no need to put sleep function in the loop
+- tested with 1000Hz and 800Hz, responded 970Hz and 790Hz
+
+- TODO:
+  - Add button to the interface
+
+## 11/7/2019
+
+- Ni-daq python package ,source code of read() funciton
+- MATLAB simulink stream to server
+- NI-daq python package tech service
+
 - game logic returns a flag to record data
 - pygame logic clock.tick sleeps the whole loop
 
