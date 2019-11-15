@@ -20,9 +20,9 @@ RIGHT_SENSOR="Dev1/ai0"
 
 class signal_processor(object):
     def __init__(self,channels=[RIGHT_SENSOR,LEFT_SENSOR],ni_fs=1000,ref_inx=0):
-        savetag='max_test'
-        savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
-        # savedir='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\data\\'
+        savetag='max_test418'
+        # savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
+        savedir='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\data\\'
         self.savepath=savedir+savetag+'.csv'
         
         self.channels=channels
@@ -35,13 +35,13 @@ class signal_processor(object):
         #######data networking###
         # self.sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 
-        self.calibrate=calibrator(self.savepath)
-        time.sleep(1.0)
+        # self.calibrate=calibrator(self.savepath)
+        # time.sleep(1.0)
         try:
             self.to_record_arr=[]
             self.now=time.time()
             self.counter=0
-            NIstreamer.fake_streaming(channels,self.callback_cali,ni_fs)
+            NIstreamer.start_streaming(channels,self.callback_cali,ni_fs)
             
         except: pass
 
@@ -76,13 +76,15 @@ class signal_processor(object):
         if type(sample)!=list:
             sample=[sample]
       
-        if self.counter%37==0:
-            self.record_flag,self.tag=self.calibrate.logic(sample)
+        # if self.counter%37==0:
+        #     self.record_flag,self.tag=self.calibrate.logic(sample)
 
-        if self.record_flag:
-            timestamp=time.time()-self.now
-            self.to_record_arr.append([sample,self.tag,timestamp])
-        self.counter+=1
+        # if self.record_flag:
+        timestamp=time.time()-self.now
+        print(timestamp)
+        # self.to_record_arr.append([sample,'tag',timestamp])
+        # self.counter+=1
+       
 
     def callback_game(self,sample):
         
