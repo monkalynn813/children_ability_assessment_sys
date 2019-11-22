@@ -5,6 +5,8 @@ import time
 import NIstreamer
 from arm_game import gamer
 from max_test import calibrator
+import warnings
+import copy
 
 CALIBRATION=[53,51.9] ##Modl [77(RIGHT),76(LEFT)]
 LEFT_SENSOR="Dev1/ai1"
@@ -34,12 +36,13 @@ class signal_processor(object):
         
         self.to_record_arr=[]
         self.counter=0
+        self.record_flag=False
         self.now=time.time()
-        # try:
-        NIstreamer.start_streaming(channels,self.callback_cali,ni_fs)
-            # NIstreamer.fake_streaming(channels,self.callback_cali,ni_fs)
+        try:
+        # NIstreamer.start_streaming(channels,self.callback_cali,ni_fs)
+            NIstreamer.fake_streaming(channels,self.callback_cali,ni_fs)
             
-        # except: pass
+        except: pass
 
        
         self.offset=self.pre_exp.get_offset()
@@ -51,17 +54,17 @@ class signal_processor(object):
             tag=self.to_record_arr[i][1]
             timestamp=self.to_record_arr[i][2]
 
-            ##calibration
+            ##calibration: convert to torque
             sample[0]-=self.offset[0]
             sample[1]-=self.offset[1]
             sample[0]*=CALIBRATION[0]
             sample[1]*=CALIBRATION[1]
 
-            ##compute and plot max
+            ##compute and plot max only for reference arm ---> for visual feedback
             if tag=='max_push':
-                push_arr.append(sample)
+                push_arr.append(sample[self.ref_inx])
             elif tag=='max_pull':
-                pull_arr.append(sample)
+                pull_arr.append(sample[self.ref_inx])
 
         self.max_push,self.max_pull=get_maximum(push_arr,pull_arr)   
         print(self.max_pull,self.max_push)
@@ -74,16 +77,18 @@ class signal_processor(object):
     def callback_cali(self,sample):
         if type(sample)!=list:
             sample=[sample]
-      
-        if self.counter%self.render_lag==0:
+             
+
+        if self.counter>self.render_lag:
             self.record_flag,self.tag=self.pre_exp.logic(sample)
+            self.counter=0
 
         if self.record_flag:
             timestamp=time.time()-self.now
             self.to_record_arr.append([sample,self.tag,timestamp])
 
-
-        #####Test sampling rate#####
+        self.counter+=1
+        ####Test sampling rate#####
         # self.counter+=1
         # timestamp=time.time()
         # elapsed=timestamp-self.now
@@ -135,36 +140,70 @@ class signal_processor(object):
             f.write(row)
 
 ######helper function###############
-def lowpass(cutoff,data,fs,order=5):
-    nyq=0.5*fs
-    normal_cutoff=cutoff/nyq
-    b, a = signal.butter(order, normal_cutoff, btype='low',analog=False)
-    return signal.lfilter(b, a, data, axis=0)
 
 def get_maximum(push_arr,pull_arr):
     """return [push max, pull max]"""
     window_size=200
     step_size=1
-    c_pre=0
+    max_push=0
+    max_pull=0
+    push_p=0
+    push_n=0
 
-    for i in range(len(push_arr)-window_size):
-        c_win=pull_arr[i:i+window_size]
-        c_ma=np.average(c_win)
-        
-        if c_ma>=c_pre:
-            max_push=c_ma
-        c_pre=c_ma
+    print("lenghths:",len(push_arr),len(pull_arr))
+    for ele in push_arr:
+        if np.sign(ele)>0:
+            push_p+=1
+        else:
+            push_n+=1
     
-    c_pre=0
-    for i in range(len(pull_arr)-window_size):
-        c_win=pull_arr[i:i+window_size]
-        c_ma=np.average(c_win)
-        if c_ma>=c_pre:
-            max_pull=c_ma
-        c_pre=c_ma
-    return [max_push,max_pull]
+    if push_p>push_n:
+        #push on reference arm ---> positivie signal
+        #pull --> negative
+        for i in range(len(push_arr)-window_size):
+            c_win=push_arr[i:i+window_size]
+            c_ma=np.average(c_win)
+            
+            if c_ma>=max_push:
+                max_push=c_ma
+   
+    
+
+        for i in range(len(pull_arr)-window_size):
+            c_win=pull_arr[i:i+window_size]
+            c_ma=np.average(c_win)
+            if c_ma<=max_pull:
+                max_pull=c_ma
+
+        
+        return [max_push,max_pull]
+        
+    elif push_p<push_n:
+        #push on reference arm ---> negative signal
+        #pull --> postivie
+        for i in range(len(push_arr)-window_size):
+            c_win=push_arr[i:i+window_size]
+            c_ma=np.average(c_win)
+            
+            if c_ma<=max_push:
+                max_push=c_ma
+       
+    
+   
+        for i in range(len(pull_arr)-window_size):
+            c_win=pull_arr[i:i+window_size]
+            c_ma=np.average(c_win)
+            if c_ma>=max_pull:
+                max_pull=c_ma
+          
+        
+        return [max_push,max_pull]
+    else:
+        warnings.warn('Cannot figure out sign of the reference sensor.')
+
+
 def main():
-    signal_processor(ni_fs=1000)    
+    signal_processor(ni_fs=800)    
 
 if __name__ == '__main__':
 	main()

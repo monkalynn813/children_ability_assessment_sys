@@ -42,7 +42,7 @@ def fake_streaming(channels,callback,ni_fs=1000):
     while True:
         now=time.time()
         raw_sig=sin(2*np.pi*3*i)+sin(2*np.pi*0.5*i)
-        callback([raw_sig])
+        callback([raw_sig,raw_sig])
 
         i+=period
 
