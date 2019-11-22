@@ -2,6 +2,8 @@
 ## Engineering Journal
 #### Jingyan Ling
 
+- USB 
+- if lag: lowering the sample rate
 
 ## 11/15/2019
 
@@ -15,7 +17,7 @@
 
 ## 11/7/2019
 
-- Ni-daq python package ,source code of read() funciton
+- Ni-daq python package ,source code of read() function
 - MATLAB simulink stream to server
 - NI-daq python package tech service
 
