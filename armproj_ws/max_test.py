@@ -7,8 +7,8 @@ import time
 import matplotlib.pyplot as plt
 
 
-path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
-# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+# path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
+path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
 
 
 class calibrator(object):
@@ -90,7 +90,7 @@ class calibrator(object):
                 self.data_4cali.append(signal)
                 eclapsed= time.time()-self.now
                 self.cali_progress.width += 3
-                self.cali_percent=round(eclapsed / 3, 3) * 100
+                self.cali_percent=round(eclapsed*100.0 / 3, 2) 
                 if eclapsed>3.0:
                     self.zero_flag=False
                     data4cali=np.array(self.data_4cali)
@@ -125,7 +125,7 @@ class calibrator(object):
                 self.cloud.x=1100
 
                 ref_sample=signal[self.ref_index]-self.offset[self.ref_index]
-                if abs(ref_sample)>0.8:
+                if abs(ref_sample)>0.15:
                 # if keys[pygame.K_RIGHT]:
                     self.test_progress.width += 2
                 elif self.test_progress.width>0: 
@@ -170,7 +170,7 @@ class calibrator(object):
                 self.cloud.x=45
 
                 ref_sample=signal[self.ref_index]-self.offset[self.ref_index]
-                if abs(ref_sample)>0.8:
+                if abs(ref_sample)>0.15:
                 # if keys[pygame.K_LEFT]:
                     self.test_progress.width -= 2
                 elif self.test_progress.width <0: 

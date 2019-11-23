@@ -7,11 +7,8 @@ import time
 import socket
 import json
 
-path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
-# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
-
-UDP_IP = "127.0.0.1" 
-FLAG_PORT=5004
+# path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
+path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
 
 
 class gamer(object):
@@ -37,23 +34,6 @@ class gamer(object):
         self.indi_mode_flag=False
         # while True:
         #     self.game_logic()
-    def record_to_file(self,data,tag):
-        """
-        type(data)==list
-        [sensor_data,sensor_data,...]
-        tag=str i.e 'reference'
-        """
-        row=''
-        for d in data:
-            row+=str(d)
-            row+=','
-        row+=str(tag)
-        row+='\n'
-        with open(self.savepath,'a') as f:
-            f.write(row)
-    # def send_flag(self,flag): #Flag=boolean
-    #     msg=json.dumps(flag).encode()
-    #     self.sock_flag.sendto(msg,(UDP_IP,FLAG_PORT))
         
 ###ELEMENT INITILIZATION############
 
@@ -104,10 +84,9 @@ class gamer(object):
 
     def game_logic(self,signal,threshold,ref_inx):
 #in while loop (callback)
-        # while True:
+        self.record_flag=False
+        self.record_tag=None
 
-        # self.clock.tick(27) ##60fps
-        # events:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.run = False
@@ -117,7 +96,8 @@ class gamer(object):
 
         if not self.indi_mode_flag:
             ####PROGRESS BAR
-            self.record_to_file(signal,'reference')
+            self.record_flag=True
+            self.record_tag='reference'
             if signal[ref_inx]>threshold and self.progress.height>=-self.screenheight:
             # if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
                 self.progress.height-= self.progress.vel*2
@@ -143,7 +123,9 @@ class gamer(object):
                 self.hint_flag=False
             if not self.hint_flag:
                 if not self.fade_flag:
-                    self.record_to_file(signal,'indicative')
+                    self.record_flag=True
+                    self.record_tag='indicative'
+                    
                 if keys[pygame.K_SPACE]:
                     self.fade_flag=True
                 
@@ -193,7 +175,7 @@ class gamer(object):
 
             # self.send_flag(record_flag)
         self.draw()  
-        
+        return self.record_flag,self.record_tag
         # pygame.quit()
     
     def draw(self):
@@ -242,7 +224,7 @@ class gamer(object):
 
         pygame.display.update()
 
-    
+        
     def blit_alpha(self, source, location, opacity):
         target=self.win
         x = location[0]

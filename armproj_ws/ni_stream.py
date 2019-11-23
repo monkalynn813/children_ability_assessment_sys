@@ -2,15 +2,15 @@
 
 import numpy as np 
 import time
-import NIstreamer
+from NIstreamer import *
 from arm_game import gamer
 from max_test import calibrator
 import warnings
 import copy
 
-CALIBRATION=[53,51.9] ##Modl [77(RIGHT),76(LEFT)]
-LEFT_SENSOR="Dev1/ai1"
-RIGHT_SENSOR="Dev1/ai0"
+CALIBRATION=[51.9,53] ##Modl [76(RIGHT),77(LEFT)]
+LEFT_SENSOR="Dev1/ai0"
+RIGHT_SENSOR="Dev1/ai1"
 
 
 class signal_processor(object):
@@ -20,10 +20,12 @@ class signal_processor(object):
         ni_fs: sampling rate
         ref_inx: index number for the channel list of which arm is the reference arm
         """
-        savetag='test_fs'
-        savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
-        # savedir='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\data\\'
-        self.savepath=savedir+savetag+'.csv'
+        savetag_cali='test_fs'
+        savetag_game='test_game'
+        # savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
+        savedir='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\data\\'
+        self.savepath_cali=savedir+savetag_cali+'.csv'
+        self.savepath_game=savedir+savetag_game+'.csv'
         
         self.channels=channels
         self.ni_fs=ni_fs
@@ -32,20 +34,22 @@ class signal_processor(object):
         render_fps=27
         self.render_lag=int(ni_fs/render_fps)
 
-        self.pre_exp=calibrator(self.ref_inx,self.savepath)
+        self.pre_exp=calibrator(self.ref_inx,self.savepath_cali)
         
         self.to_record_arr=[]
         self.counter=0
         self.record_flag=False
         self.now=time.time()
         try:
-        # NIstreamer.start_streaming(channels,self.callback_cali,ni_fs)
-            NIstreamer.fake_streaming(channels,self.callback_cali,ni_fs)
+            NI=ni_stream('max_test')
+            NI.start_streaming(channels,self.callback_cali,ni_fs)
+            # NIstreamer.fake_streaming(channels,self.callback_cali,ni_fs)
             
         except: pass
 
-       
+        NI.stop_streaming()
         self.offset=self.pre_exp.get_offset()
+        print('offset:',self.offset)
         push_arr=[]
         pull_arr=[]
         
@@ -60,25 +64,31 @@ class signal_processor(object):
             sample[0]*=CALIBRATION[0]
             sample[1]*=CALIBRATION[1]
 
-            ##compute and plot max only for reference arm ---> for visual feedback
+            ##compute max only for reference arm ---> for visual feedback
             if tag=='max_push':
                 push_arr.append(sample[self.ref_inx])
             elif tag=='max_pull':
                 pull_arr.append(sample[self.ref_inx])
-
+        
+        self.record_to_file(self.to_record_arr,self.savepath_cali)
         self.max_push,self.max_pull=get_maximum(push_arr,pull_arr)   
-        print(self.max_pull,self.max_push)
-        self.record_to_file(self.to_record_arr)
-        # self.max_torque=self.calibrate.get_maximum()
-        # self.game=gamer(self.savepath)
-        # NIstreamer.fake_streaming(channels,self.callback_game,ni_fs)
-        # NIstreamer.fake_streaming(channels,self.callback,ni_fs)
+        print('max push:',self.max_push,'max_pull:',self.max_pull)
+        
+
+        self.game=gamer(self.savepath_game)
+        self.to_record_arr=[]
+        self.counter=0
+        self.record_flag=False
+        self.now=time.time()
+        NI=ni_stream('game')
+        NI.start_streaming(channels,self.callback_game,ni_fs)
+ 
     
     def callback_cali(self,sample):
         if type(sample)!=list:
             sample=[sample]
              
-
+        # print(sample)
         if self.counter>self.render_lag:
             self.record_flag,self.tag=self.pre_exp.logic(sample)
             self.counter=0
@@ -88,7 +98,7 @@ class signal_processor(object):
             self.to_record_arr.append([sample,self.tag,timestamp])
 
         self.counter+=1
-        ####Test sampling rate#####
+        ##Test sampling rate#####
         # self.counter+=1
         # timestamp=time.time()
         # elapsed=timestamp-self.now
@@ -107,19 +117,22 @@ class signal_processor(object):
         raw_torque=[]
         for i in range(len(sample)):
             chn_data=sample[i]-self.offset[i]
-            raw_torque.append(CALIBRATION[0]*chn_data)
+            raw_torque.append(CALIBRATION[i]*chn_data)
         
+        abs_torque=[abs(ele) for ele in raw_torque]
+        if self.counter>self.render_lag:
+            
+            print(sample,abs_torque)
+            self.game.game_logic(abs_torque,abs(self.max_push*0.4),self.ref_inx)
+            self.counter=0
 
-        if len(self.raw_sig_arr)>=self.window_size:
-        
-            self.game.game_logic(raw_torque,self.max_torque[0]*0.4,self.ref_inx)
-        else:
-            if len(self.raw_sig_arr)==0:
-                print('Please wait for buffering...')
-            self.raw_sig_arr.append(raw_torque)
+        if self.record_flag:
+            timestamp=time.time()-self.now
+            self.to_record_arr.append([sample,self.tag,timestamp],self.savepath_game)
 
+        self.counter+=1
 
-    def record_to_file(self,array):
+    def record_to_file(self,array,savepath):
         """
         array=[data,tag,timestamp]
         type(data)==list
@@ -136,7 +149,7 @@ class signal_processor(object):
             row+=','
             row+=str(a[2])
             row+='\n'
-        with open(self.savepath,'a') as f:
+        with open(savepath,'a') as f:
             f.write(row)
 
 ######helper function###############
@@ -150,7 +163,7 @@ def get_maximum(push_arr,pull_arr):
     push_p=0
     push_n=0
 
-    print("lenghths:",len(push_arr),len(pull_arr))
+    print("record length:",len(push_arr),len(pull_arr))
     for ele in push_arr:
         if np.sign(ele)>0:
             push_p+=1
