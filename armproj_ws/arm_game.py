@@ -7,8 +7,8 @@ import time
 import socket
 import json
 
-path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
-# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+# path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
+path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
 red = (200,0,0)
 green = (0,200,0)
 
@@ -114,8 +114,8 @@ class gamer(object):
             if self.start_reference:
                 self.record_flag=True
                 self.record_tag='reference'
-                # if signal[ref_inx]>threshold and self.progress.height>=-self.screenheight:
-                if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
+                if signal[ref_inx]>threshold and self.progress.height>=-self.screenheight:
+                # if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
                     self.progress.height-= self.progress.vel*2
                 elif self.progress.height<0:
                     self.progress.height+=self.progress.vel*2

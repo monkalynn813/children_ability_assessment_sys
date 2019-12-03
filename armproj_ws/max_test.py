@@ -7,8 +7,8 @@ import time
 import matplotlib.pyplot as plt
 
 
-path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
-# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+# path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
+path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
 red = (200,0,0)
 green = (0,200,0)
 
@@ -41,8 +41,8 @@ class calibrator(object):
         
 
         self.run=True
-        while self.run:
-            self.logic([1,4])
+        # while self.run:
+        #     self.logic([1,4])
 
     def plot_init(self):
         self.show_pushplot=False
@@ -258,6 +258,7 @@ class calibrator(object):
                 self.finish_b=False
                 self.run=False
                 pygame.quit()
+            print(self.record_flag,self.record_tag)
             return self.record_flag,self.record_tag
 
     def draw(self):
@@ -381,8 +382,8 @@ def button(gameDisplay,msg,x,y,w,h,ic,ac,tc=(0,0,0),action=None):
     textRect.center = ( (x+(w/2)), (y+(h/2)) )
     gameDisplay.blit(textSurf, textRect)
     return check
-def main():
-    calibrator(0)    
+# def main():
+#     calibrator(0)    
             
-if __name__ == '__main__':
-	main()
+# if __name__ == '__main__':
+# 	main()

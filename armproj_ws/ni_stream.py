@@ -20,8 +20,8 @@ class signal_processor(object):
         ni_fs: sampling rate
         ref_inx: index number for the channel list of which arm is the reference arm
         """
-        savetag_cali='test_fs'
-        savetag_game='test_game'
+        savetag_cali='demo_cali'
+        savetag_game='demo_game'
         # savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
         savedir='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\data\\'
         self.savepath_cali=savedir+savetag_cali+'.csv'
@@ -75,13 +75,15 @@ class signal_processor(object):
         print('max push:',self.max_push,'max_pull:',self.max_pull)
         
 
-        self.game=gamer(self.savepath_game)
+        self.game=gamer()
         self.to_record_arr=[]
         self.counter=0
         self.record_flag=False
         self.now=time.time()
-        NI=ni_stream('game')
-        NI.start_streaming(channels,self.callback_game,ni_fs)
+        try:
+            NI=ni_stream('game')
+            NI.start_streaming(channels,self.callback_game,ni_fs)
+        except: pass
  
     
     def callback_cali(self,sample):
