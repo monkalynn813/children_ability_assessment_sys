@@ -7,8 +7,8 @@ import time
 import matplotlib.pyplot as plt
 
 
-# path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
-path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
+# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
 
 
 class calibrator(object):
@@ -17,6 +17,8 @@ class calibrator(object):
         self.ref_index=ref_index
 
         pygame.init()
+        pygame.mixer.music.load(path+'music.mp3')
+        pygame.mixer.music.play(-1)
         self.screenwidth=1290
         self.screenheight=768
         self.win=pygame.display.set_mode((self.screenwidth,self.screenheight))
@@ -33,8 +35,8 @@ class calibrator(object):
         
 
         self.run=True
-        # while self.run:
-        #     self.logic([1,4])
+        while self.run:
+            self.logic([1,4])
 
     def plot_init(self):
         self.show_pushplot=False
@@ -125,19 +127,28 @@ class calibrator(object):
                 self.cloud.x=1100
 
                 ref_sample=signal[self.ref_index]-self.offset[self.ref_index]
-                if abs(ref_sample)>0.15:
-                # if keys[pygame.K_RIGHT]:
+                # if abs(ref_sample)>0.15:
+                if keys[pygame.K_RIGHT]:
                     self.test_progress.width += 2
+                    if self.test_progress.width ==2:
+                        self.test_progress.effect.play()
                 elif self.test_progress.width>0: 
                     self.test_progress.width -= 2
-
+                    try:
+                        self.test_progress.effect.stop()
+                    except:pass
+                    
                 self.maxpush_data.append(ref_sample)
                 
                 eclapsed=time.time()-self.now
                 self.time_left= int(5- eclapsed)
                 if eclapsed > 5.0:
+                    try:
+                        self.test_progress.effect.stop()
+                    except:pass
                     self.do_push_test=False
                     self.push_test_done=True
+                    self.test_progress.applause.play()
                     
 
             if self.push_test_done and not self.do_pull_test and not self.max_pull_hint and not self.pull_test_done:
@@ -170,18 +181,27 @@ class calibrator(object):
                 self.cloud.x=45
 
                 ref_sample=signal[self.ref_index]-self.offset[self.ref_index]
-                if abs(ref_sample)>0.15:
-                # if keys[pygame.K_LEFT]:
+                # if abs(ref_sample)>0.15:
+                if keys[pygame.K_LEFT]:
                     self.test_progress.width -= 2
+                    if self.test_progress.width ==-2:
+                        self.test_progress.effect.play()
                 elif self.test_progress.width <0: 
                     self.test_progress.width += 2
+                    try:
+                        self.test_progress.effect.stop()
+                    except:pass
                 
                 self.maxpull_data.append(ref_sample)
                 eclapsed=time.time()-self.now
                 self.time_left= int(5- eclapsed)
                 if eclapsed > 5.0:
+                    try:
+                        self.test_progress.effect.stop()
+                    except:pass
                     self.do_pull_test=False
                     self.pull_test_done=True
+                    self.test_progress.applause.play()
                
             
             if self.pull_test_done:
@@ -277,6 +297,8 @@ class progressbar_generator(object):
         self.height=height
         self.vel=5
         self.color=color
+        self.effect=pygame.mixer.Sound(path+'bubbles_sfx.wav')
+        self.applause=pygame.mixer.Sound(path+'applause2_x.wav')
 
 class showpic_generator(object):
     def __init__(self):
@@ -285,8 +307,8 @@ class showpic_generator(object):
         self.bg=pygame.image.load(path+'bg2.jpg')
         self.bg=pygame.transform.scale(self.bg,(1290,768))
 
-# def main():
-#     calibrator()    
+def main():
+    calibrator(0)    
             
-# if __name__ == '__main__':
-# 	main()
+if __name__ == '__main__':
+	main()

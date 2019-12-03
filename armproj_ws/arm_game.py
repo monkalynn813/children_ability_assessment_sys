@@ -7,15 +7,16 @@ import time
 import socket
 import json
 
-# path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
-path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
+# path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
 
 
 class gamer(object):
-    def __init__(self,savepath):
-        # self.sock_flag = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-        self.savepath=savepath
+    def __init__(self):
+
         pygame.init()
+        pygame.mixer.music.load(path+'music.mp3')
+        pygame.mixer.music.play(-1)
         self.screenwidth=1290
         self.screenheight=768
         self.win=pygame.display.set_mode((self.screenwidth,self.screenheight))
@@ -32,8 +33,8 @@ class gamer(object):
         ######################
 
         self.indi_mode_flag=False
-        # while True:
-        #     self.game_logic()
+        while True:
+            self.game_logic()
         
 ###ELEMENT INITILIZATION############
 
@@ -82,7 +83,7 @@ class gamer(object):
         
 ########################################
 
-    def game_logic(self,signal,threshold,ref_inx):
+    def game_logic(self,signal=None,threshold=None,ref_inx=None):
 #in while loop (callback)
         self.record_flag=False
         self.record_tag=None
@@ -98,8 +99,8 @@ class gamer(object):
             ####PROGRESS BAR
             self.record_flag=True
             self.record_tag='reference'
-            if signal[ref_inx]>threshold and self.progress.height>=-self.screenheight:
-            # if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
+            # if signal[ref_inx]>threshold and self.progress.height>=-self.screenheight:
+            if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
                 self.progress.height-= self.progress.vel*2
             elif self.progress.height<0:
                 self.progress.height+=self.progress.vel*2
@@ -109,12 +110,16 @@ class gamer(object):
             if self.progress.height<=(-self.screenheight+10):
                 self.rain_flag=True
                 self.rain_counter+=1
-                
+                if self.rain_counter==1:
+                    self.rain.effect.play()                
                 if self.rain_counter>9:
                     self.rain_counter=0
                     self.fade_flag=True
                     
             else:
+                try:
+                    self.rain.effect.stop()
+                except: pass
                 self.rain_flag=False
                 self.rain_counter=0
                 self.fade_flag=False
@@ -210,10 +215,13 @@ class gamer(object):
 
             ##RAIN DROP
             if self.rain_flag and not self.clean_flag:
+                
                 self.win.blit(self.rain.rain_img[int(self.rain_counter//6)],(self.rain.x,self.rain.y))
-            
+                
             ##RAINBOW
             if self.clean_flag:
+                if self.rainbow_movecount==self.rainbow_vel:
+                    self.rainbow.effect.play()
                 self.win.blit(self.rainbow.rainbow,(self.rainbow.x+self.rainbow_movecount,self.rainbow.y))
                 self.win.blit(self.rainbow.rainbow,(self.rainbow.x-self.rainbow_movecount,self.rainbow.y))
             if self.text_flag:
@@ -249,6 +257,7 @@ class rain_drop_generator(object):
         self.rain_img=[pygame.image.load(path+'raindrops.png'),pygame.image.load(path+'raindrops2.png')]
         self.x=x
         self.y=y
+        self.effect=pygame.mixer.Sound(path+'bubbles_sfx.wav')
 
 class showpic_generator(object):
     def __init__(self):
@@ -284,6 +293,7 @@ class rainbow_generator(object):
         self.y=550
         self.rainbow=pygame.image.load(path+'rainbow.png')
         self.rainbow=pygame.transform.scale(self.rainbow,(self.width,self.height))
+        self.effect=pygame.mixer.Sound(path+'applause2_x.wav')
 class house_generator(object):
     def __init__(self):
         global path
@@ -297,8 +307,8 @@ class house_generator(object):
         self.plus1=pygame.transform.scale(self.plus1,(75,75))
 
 
-# def main():
-#     gamer()    
+def main():
+    gamer()    
             
-# if __name__ == '__main__':
-# 	main()
+if __name__ == '__main__':
+	main()
