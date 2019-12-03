@@ -9,7 +9,12 @@ import matplotlib.pyplot as plt
 
 path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
 # path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+red = (200,0,0)
+green = (0,200,0)
 
+bright_red = (255,0,0)
+bright_green = (0,255,0)
+ 
 
 class calibrator(object):
     def __init__(self,ref_index,savepath=None):
@@ -32,6 +37,7 @@ class calibrator(object):
         self.progressbar_init()
         self.clouds_init()
         self.plot_init()
+        self.button_init()
         
 
         self.run=True
@@ -65,9 +71,19 @@ class calibrator(object):
         self.maxpull_data=[]
         self.maxpush_data=[]
     def progressbar_init(self):
-        self.cali_progress=progressbar_generator(self.screenwidth//2-100,self.screenheight//2 +50,0,40,(65, 220, 244))  
-        self.test_progress=progressbar_generator(self.screenwidth//2,self.screenheight//2,0,40,(65,220,244))
     
+        self.test_progress=progressbar_generator(self.screenwidth//2,self.screenheight//2,0,40,(65,220,244))
+    def button_init(self):
+        self.zeroing_b=False
+        self.rezero_b=False
+        self.starttest_b=False
+        self.startpull_b=False
+        self.pushtest_b=False
+        self.pulltest_b=False
+        self.repush_b=False
+        self.repull_b=False
+        self.finish_b=False
+
     def get_offset(self):
         return self.offset
     
@@ -76,22 +92,25 @@ class calibrator(object):
             # self.clock.tick(27)
             self.record_flag=False
             self.record_tag=None
+     
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.run = False
 
             keys=pygame.key.get_pressed()
-
+  
+                        
             #Do the zeroing
-            if not self.zero_done_flag and keys[pygame.K_RETURN]:
+            if self.zeroing_b:
                 #get average in 3s and set as offset
                 self.zero_flag=True
+                self.zeroing_b=False
                 self.now=time.time()
-            
+          
             if self.zero_flag:
                 self.data_4cali.append(signal)
                 eclapsed= time.time()-self.now
-                self.cali_progress.width += 3
+  
                 self.cali_percent=round(eclapsed*100.0 / 3, 2) 
                 if eclapsed>3.0:
                     self.zero_flag=False
@@ -102,24 +121,29 @@ class calibrator(object):
                     self.zero_done_flag=True
             
             #Redo the zeroing
-            if self.zero_done_flag and not self.max_torque_test and keys[pygame.K_BACKSPACE]:
+            
+            if self.rezero_b:
+                self.rezero_b=False
                 self.zero_done_flag=False
                 self.data_4cali=[]
                 self.offset=[]
                 self.zero_flag=True
-                self.cali_progress.width = 0
+
                 self.now=time.time()
             
             #Press Enter at offset screen to start maximum torque test
-            if self.zero_done_flag and not self.max_torque_test and keys[pygame.K_RETURN]:
+            if self.starttest_b:
+            # if self.zero_done_flag and not self.max_torque_test and keys[pygame.K_RETURN]:
                 self.max_torque_test=True
                 self.max_push_hint=True
+                self.starttest_b=False
                 
             
-            if self.max_push_hint and keys[pygame.K_SPACE]:
+            if self.pushtest_b:
                 self.max_push_hint=False
-                self.do_push_test=True #replace this for actual visual feedback later
+                self.do_push_test=True 
                 self.now=time.time()
+                self.pushtest_b=False
 
             if self.do_push_test:
                 self.record_flag=True
@@ -159,21 +183,24 @@ class calibrator(object):
                     plt.plot(self.maxpush_data)
                     plt.savefig(path+'max_push.png')
                     self.make_push_plot=False
-                if keys[pygame.K_BACKSPACE]:
+                if self.repush_b:
                     self.show_pushplot=False
                     self.make_push_plot=True
                     self.push_test_done=False
                     self.max_push_hint=True
                     self.maxpush_data=[]
+                    self.repush_b=False
                     
-                if keys[pygame.K_RETURN]:
+                if self.startpull_b:
                     self.max_pull_hint=True
                     self.show_pushplot=False
+                    self.startpull_b=False
             
-            if self.max_pull_hint and keys[pygame.K_SPACE]:
+            if self.pulltest_b:
                 self.max_pull_hint=False
                 self.do_pull_test=True
                 self.now=time.time()
+                self.pulltest_b=False
             
             if self.do_pull_test:
                 self.record_flag=True
@@ -213,44 +240,54 @@ class calibrator(object):
                     plt.savefig(path+'max_pull.png')
                     self.make_pull_plot=False
                 self.test_progress.width=0
-                if keys[pygame.K_BACKSPACE]:
+                if self.repull_b:
                     self.maxpull_data=[]
                     self.pull_test_done=False
                     self.max_pull_hint=True
                     self.show_pullplot=False
                     self.make_pull_plot=True
+                    self.repull_b=False
 
-                if keys[pygame.K_RETURN]:
-                    pygame.quit()
-                    self.run=False
+
         
             try:
                 self.draw()
             except: pass
-
+            
+            if self.finish_b:
+                self.finish_b=False
+                self.run=False
+                pygame.quit()
             return self.record_flag,self.record_tag
 
     def draw(self):
         self.win.blit(self.bgpic.bg,(0,0))
+        if not self.zero_done_flag and not self.zero_flag:
+            self.zeroing_b=button(self.win,'Zeroing',self.screenwidth//2-60,self.screenheight//2,120,70,green,bright_green)
         
         if self.zero_flag:
             font=pygame.font.SysFont("comicsansms",75)
             self.hint=font.render("Calibrating ... " + str(self.cali_percent) + '%'  , True, (43, 9, 183))
             self.win.blit(self.hint,(self.screenwidth//2-self.hint.get_width()//2,self.screenheight//2-self.hint.get_height()//2))
-            pygame.draw.rect(self.win,self.cali_progress.color, (self.cali_progress.x,self.cali_progress.y,self.cali_progress.width,self.cali_progress.height))
+            
         #show offset after zeroing
         if self.zero_done_flag and not self.max_torque_test:
             font=pygame.font.SysFont("comicsansms",25)
             self.zero_result=font.render(str(self.offset), True, (43, 9, 183))
             self.win.blit(self.zero_result,(self.screenwidth//2-self.zero_result.get_width()//2,self.screenheight//2-self.zero_result.get_height()//2))
+            self.rezero_b=button(self.win,'Redo',self.screenwidth//2-260,self.screenheight//2+200,120,70,red,bright_red)
+            self.starttest_b=button(self.win,'Start Test',self.screenwidth//2+120,self.screenheight//2+200,120,70,green,bright_green)
+        
         if self.max_push_hint:
             font=pygame.font.SysFont("comicsansms",75)
             self.hint=font.render("Push the best you can for 5 sec", True, (43, 9, 183))
             self.win.blit(self.hint,(self.screenwidth//2-self.hint.get_width()//2,self.screenheight//2-self.hint.get_height()//2))
+            self.pushtest_b=button(self.win,'I am ready',self.screenwidth//2-60,self.screenheight//2+200,120,70,green,bright_green)
         if self.max_pull_hint:
             font=pygame.font.SysFont("comicsansms",75)
             self.hint=font.render("Pull the best you can for 5 sec", True, (43, 9, 183))
             self.win.blit(self.hint,(self.screenwidth//2-self.hint.get_width()//2,self.screenheight//2-self.hint.get_height()//2))
+            self.pulltest_b=button(self.win,'I am ready',self.screenwidth//2-60,self.screenheight//2+200,120,70,green,bright_green)
         if self.do_push_test or self.do_pull_test:
             self.win.blit(self.cloud.img,(self.cloud.x,self.cloud.y))
             font=pygame.font.SysFont("comicsansms",90)
@@ -260,9 +297,13 @@ class calibrator(object):
         if self.show_pushplot:
             self.push_plot=img_generator(1000,600,self.screenwidth//2-500,self.screenheight//2-300,'max_push.png')
             self.win.blit(self.push_plot.img,(self.push_plot.x,self.push_plot.y))
+            self.repush_b=button(self.win,'Redo',self.screenwidth//2-260,self.screenheight//2+250,120,70,red,bright_red)
+            self.startpull_b=button(self.win,'Continue',self.screenwidth//2+120,self.screenheight//2+250,120,70,green,bright_green)
         if self.show_pullplot:
             self.pull_plot=img_generator(1000,600,self.screenwidth//2-500,self.screenheight//2-300,'max_pull.png')
             self.win.blit(self.pull_plot.img,(self.pull_plot.x,self.pull_plot.y))
+            self.repull_b=button(self.win,'Redo',self.screenwidth//2-260,self.screenheight//2+250,120,70,red,bright_red)
+            self.finish_b=button(self.win,'Finish',self.screenwidth//2+120,self.screenheight//2+250,120,70,green,bright_green)
         
         pygame.display.update()
     def record_to_file(self,data,tag):
@@ -307,6 +348,39 @@ class showpic_generator(object):
         self.bg=pygame.image.load(path+'bg2.jpg')
         self.bg=pygame.transform.scale(self.bg,(1290,768))
 
+def button(gameDisplay,msg,x,y,w,h,ic,ac,tc=(0,0,0),action=None):
+    """
+    gameDisplay: pygame window
+    msg: text on the button
+    x,y: position
+    w,h: width and height
+    ic, ac: color of the button when not activated and activiated
+    tc: text color, default: black
+    action: function of this button
+    return: boolean, if this button is clicked
+    """
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+    check = False
+
+    if x+w > mouse[0] > x and y+h > mouse[1] > y:
+        pygame.draw.rect(gameDisplay, ac,(x,y,w,h))
+    
+        if click[0] == 1:
+            check=True  
+            if action != None:
+                action() 
+                  
+
+    else:
+        pygame.draw.rect(gameDisplay, ic,(x,y,w,h))
+
+    smallText = pygame.font.SysFont("comicsansms",23)
+    textSurf = smallText.render(msg, True, tc)
+    textRect = textSurf.get_rect()
+    textRect.center = ( (x+(w/2)), (y+(h/2)) )
+    gameDisplay.blit(textSurf, textRect)
+    return check
 def main():
     calibrator(0)    
             
