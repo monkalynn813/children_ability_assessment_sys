@@ -9,7 +9,11 @@ import json
 
 path='/home/jingyan/Documents/spring_proj/armproj_ws/img/'
 # path='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\img\\'
+red = (200,0,0)
+green = (0,200,0)
 
+bright_red = (255,0,0)
+bright_green = (0,255,0)
 
 class gamer(object):
     def __init__(self):
@@ -30,6 +34,7 @@ class gamer(object):
         self.rainbow_init()
         self.house_init()
         self.hint_init()
+        self.buttons_init()
         ######################
 
         self.indi_mode_flag=False
@@ -80,7 +85,12 @@ class gamer(object):
         self.house=house_generator()
         self.plus1_flag=False
 
-        
+    def buttons_init(self):
+        self.reference_b=False
+        self.indicative_b=False
+        self.finish_b=False
+        self.copied_b=False
+        self.start_reference=False
 ########################################
 
     def game_logic(self,signal=None,threshold=None,ref_inx=None):
@@ -97,17 +107,23 @@ class gamer(object):
 
         if not self.indi_mode_flag:
             ####PROGRESS BAR
-            self.record_flag=True
-            self.record_tag='reference'
-            # if signal[ref_inx]>threshold and self.progress.height>=-self.screenheight:
-            if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
-                self.progress.height-= self.progress.vel*2
-            elif self.progress.height<0:
-                self.progress.height+=self.progress.vel*2
-            
+            if self.reference_b:
+                self.reference_b=False
+                self.start_reference=True
 
-            ###RAIN DROP####
+            if self.start_reference:
+                self.record_flag=True
+                self.record_tag='reference'
+                # if signal[ref_inx]>threshold and self.progress.height>=-self.screenheight:
+                if keys[pygame.K_UP] and self.progress.height>=-self.screenheight:
+                    self.progress.height-= self.progress.vel*2
+                elif self.progress.height<0:
+                    self.progress.height+=self.progress.vel*2
+                
+
+                ###RAIN DROP####
             if self.progress.height<=(-self.screenheight+10):
+  
                 self.rain_flag=True
                 self.rain_counter+=1
                 if self.rain_counter==1:
@@ -115,24 +131,27 @@ class gamer(object):
                 if self.rain_counter>9:
                     self.rain_counter=0
                     self.fade_flag=True
-                    
+                
             else:
                 try:
                     self.rain.effect.stop()
                 except: pass
+
                 self.rain_flag=False
                 self.rain_counter=0
                 self.fade_flag=False
         else:
-            if keys[pygame.K_RETURN]:
+            if self.indicative_b:
+                self.indicative_b=False
                 self.hint_flag=False
             if not self.hint_flag:
                 if not self.fade_flag:
                     self.record_flag=True
                     self.record_tag='indicative'
                     
-                if keys[pygame.K_SPACE]:
+                if self.copied_b:
                     self.fade_flag=True
+                    self.copied_b=False
                 
         ###FADE DIRT#####
         if self.fade_flag and not self.clean_flag:
@@ -145,6 +164,8 @@ class gamer(object):
 
         ###RAINBOW###       
         if self.clean_flag:
+            self.record_flag=False
+            self.record_tag=None
             self.progress.height=0
             self.rainbow_movecount+=self.rainbow_vel
             if self.rainbow_movecount>80:
@@ -158,6 +179,8 @@ class gamer(object):
 
         ##SWITCH PIC
         if self.picswitch_flag:
+            self.record_flag=False
+            self.record_tag=None
             self.picrot-=1
             self.picscale-=0.05
             if self.picscale<=0.3:
@@ -171,6 +194,7 @@ class gamer(object):
                 self.plus1_flag=False
                 time.sleep(1.0)
                 self.indi_mode_flag= not self.indi_mode_flag
+                self.start_reference= False
                 if self.indi_mode_flag:
                     self.hint_flag=True
                 if self.pic_counter>self.pic_amount-1:
@@ -180,6 +204,8 @@ class gamer(object):
 
             # self.send_flag(record_flag)
         self.draw()  
+        if self.finish_b:
+            pygame.quit()
         return self.record_flag,self.record_tag
         # pygame.quit()
     
@@ -194,8 +220,17 @@ class gamer(object):
         self.win.blit(self.bgpic.bg,(0,0))
         
         if not self.hint_flag:
-            self.win.blit(showpic,(20,70))
-            self.win.blit(frame,(0,60))
+            
+            if not self.indi_mode_flag:
+                if not self.start_reference:
+                    self.reference_b=self.repull_b=button(self.win,'Continue',self.screenwidth//2-260,self.screenheight//2+250,120,70,red,bright_red)
+                    self.finish_b=button(self.win,'Finish',self.screenwidth//2+120,self.screenheight//2+250,120,70,green,bright_green)
+            else:
+                self.copied_b=button(self.win,'Copied',self.screenwidth-200,self.screenheight//2,120,70,green,bright_green)
+            
+            if self.start_reference or self.indi_mode_flag:
+                self.win.blit(showpic,(20,70))
+                self.win.blit(frame,(0,60))
             
             ##HOUSE
             self.win.blit(self.house.house,(self.house.x,self.house.y))
@@ -203,9 +238,10 @@ class gamer(object):
                 self.win.blit(self.house.plus1,(self.house.x+115,self.house.y))
             
             ##DIRT
-            if self.dirt_flag:
-                for i in range(self.dirt_amount):
-                    self.blit_alpha(self.dirt.dirt_img,(self.dirt_x[i],self.dirt_y[i]),225-self.fade_counter)
+            if self.start_reference or self.indi_mode_flag:
+                if self.dirt_flag:
+                    for i in range(self.dirt_amount):
+                        self.blit_alpha(self.dirt.dirt_img,(self.dirt_x[i],self.dirt_y[i]),225-self.fade_counter)
             
             ##PROGRESS
             if not self.clean_flag:
@@ -214,8 +250,8 @@ class gamer(object):
                 pygame.draw.rect(self.win,self.progress.color, (self.progress.x,self.progress.y,self.progress.width,self.screenheight))
 
             ##RAIN DROP
-            if self.rain_flag and not self.clean_flag:
-                
+
+            if self.rain_flag and not self.clean_flag:     
                 self.win.blit(self.rain.rain_img[int(self.rain_counter//6)],(self.rain.x,self.rain.y))
                 
             ##RAINBOW
@@ -228,7 +264,7 @@ class gamer(object):
                 self.win.blit(self.text,(self.rainbow.x-15,self.rainbow.y+50))
         else:
             self.win.blit(self.hint,(self.screenwidth//2-self.hint.get_width()//2,self.screenheight//2-self.hint.get_height()//2))
-
+            self.indicative_b=button(self.win,'I Am Ready',self.screenwidth//2-60,self.screenheight//2+200,120,70,green,bright_green)
 
         pygame.display.update()
 
@@ -305,7 +341,39 @@ class house_generator(object):
         self.house=pygame.transform.scale(self.house,(self.width,self.height))
         self.plus1=pygame.image.load(path+'plus1.png')
         self.plus1=pygame.transform.scale(self.plus1,(75,75))
+def button(gameDisplay,msg,x,y,w,h,ic,ac,tc=(0,0,0),action=None):
+    """
+    gameDisplay: pygame window
+    msg: text on the button
+    x,y: position
+    w,h: width and height
+    ic, ac: color of the button when not activated and activiated
+    tc: text color, default: black
+    action: function of this button
+    return: boolean, if this button is clicked
+    """
+    mouse = pygame.mouse.get_pos()
+    click = pygame.mouse.get_pressed()
+    check = False
 
+    if x+w > mouse[0] > x and y+h > mouse[1] > y:
+        pygame.draw.rect(gameDisplay, ac,(x,y,w,h))
+    
+        if click[0] == 1:
+            check=True  
+            if action != None:
+                action() 
+                  
+
+    else:
+        pygame.draw.rect(gameDisplay, ic,(x,y,w,h))
+
+    smallText = pygame.font.SysFont("comicsansms",23)
+    textSurf = smallText.render(msg, True, tc)
+    textRect = textSurf.get_rect()
+    textRect.center = ( (x+(w/2)), (y+(h/2)) )
+    gameDisplay.blit(textSurf, textRect)
+    return check
 
 def main():
     gamer()    

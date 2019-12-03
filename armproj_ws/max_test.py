@@ -151,8 +151,8 @@ class calibrator(object):
                 self.cloud.x=1100
 
                 ref_sample=signal[self.ref_index]-self.offset[self.ref_index]
-                # if abs(ref_sample)>0.15:
-                if keys[pygame.K_RIGHT]:
+                if abs(ref_sample)>0.15:
+                # if keys[pygame.K_RIGHT]:
                     self.test_progress.width += 2
                     if self.test_progress.width ==2:
                         self.test_progress.effect.play()
@@ -208,8 +208,8 @@ class calibrator(object):
                 self.cloud.x=45
 
                 ref_sample=signal[self.ref_index]-self.offset[self.ref_index]
-                # if abs(ref_sample)>0.15:
-                if keys[pygame.K_LEFT]:
+                if abs(ref_sample)>0.15:
+                # if keys[pygame.K_LEFT]:
                     self.test_progress.width -= 2
                     if self.test_progress.width ==-2:
                         self.test_progress.effect.play()
