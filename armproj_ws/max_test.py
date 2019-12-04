@@ -258,7 +258,7 @@ class calibrator(object):
                 self.finish_b=False
                 self.run=False
                 pygame.quit()
-            print(self.record_flag,self.record_tag)
+
             return self.record_flag,self.record_tag
 
     def draw(self):

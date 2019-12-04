@@ -8,9 +8,9 @@ from max_test import calibrator
 import warnings
 import copy
 
-CALIBRATION=[51.9,53] ##Modl [76(RIGHT),77(LEFT)]
-LEFT_SENSOR="Dev1/ai0"
-RIGHT_SENSOR="Dev1/ai1"
+CALIBRATION=[53,51.9] ##Modl [77(RIGHT),76(LEFT)]
+LEFT_SENSOR="Dev1/ai1"
+RIGHT_SENSOR="Dev1/ai0"
 
 
 class signal_processor(object):
@@ -20,8 +20,8 @@ class signal_processor(object):
         ni_fs: sampling rate
         ref_inx: index number for the channel list of which arm is the reference arm
         """
-        savetag_cali='demo_cali'
-        savetag_game='demo_game'
+        savetag_cali='demo_cali1203v2'
+        savetag_game='demo_game1203v2'
         # savedir='/home/jingyan/Documents/spring_proj/armproj_ws/data/'
         savedir='C:\\Users\\pthms\\Desktop\\ling\\children_ability_assessment_sys\\armproj_ws\\data\\'
         self.savepath_cali=savedir+savetag_cali+'.csv'
@@ -76,10 +76,13 @@ class signal_processor(object):
         
 
         self.game=gamer()
+
+        time.sleep(5)
         self.to_record_arr=[]
         self.counter=0
         self.record_flag=False
         self.now=time.time()
+        
         try:
             NI=ni_stream('game')
             NI.start_streaming(channels,self.callback_game,ni_fs)
@@ -124,7 +127,7 @@ class signal_processor(object):
         abs_torque=[abs(ele) for ele in raw_torque]
         if self.counter>self.render_lag:
             
-            print(sample,abs_torque)
+
             self.game.game_logic(abs_torque,abs(self.max_push*0.4),self.ref_inx)
             self.counter=0
 
