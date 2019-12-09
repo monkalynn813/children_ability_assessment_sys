@@ -87,6 +87,8 @@ class signal_processor(object):
             NI=ni_stream('game')
             NI.start_streaming(channels,self.callback_game,ni_fs)
         except: pass
+
+        self.record_to_file(self.to_record_arr,self.savepath_game)
  
     
     def callback_cali(self,sample):
@@ -133,7 +135,7 @@ class signal_processor(object):
 
         if self.record_flag:
             timestamp=time.time()-self.now
-            self.to_record_arr.append([sample,self.tag,timestamp],self.savepath_game)
+            self.to_record_arr.append([sample,self.tag,timestamp])
 
         self.counter+=1
 
