@@ -35,7 +35,7 @@ The system acquires torque data indicating the extent to which the participant i
 
 ## Demo and Result
 
-- One can find a demo video at [here]()
+- One can find a demo video at [here](https://youtu.be/ntOk0ySuN0E)
   
 - Data recorded for further research in the format of  ` | Right Arm Torque | Left Arm Torque | Activity | Time Stamp | `
  <img src="journal_media/result_sample.png" width="700">
