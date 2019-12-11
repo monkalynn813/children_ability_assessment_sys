@@ -1,7 +1,7 @@
 # Development of a mechatronic system to study proprioception in children
 
 #### _Jingyan Ling_
-**-March ~ December 2019**
+**-March ~ June; Oct ~ Dec 2019**
 
 - [Method](#method)
   - [Hardware Setup](#hardware-setup)
